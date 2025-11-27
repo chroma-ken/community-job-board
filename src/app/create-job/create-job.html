@@ -1,0 +1,69 @@
+<div class="job-container">
+
+  <h1 class="job-header">{{ editingId() ? 'Edit Job' : 'Create Job Posting' }}</h1>
+  <p class="job-subtitle">Post a new job or update an existing one</p>
+
+  <!-- JOB FORM -->
+  <form class="job-form" (ngSubmit)="addJob()" aria-label="Job creation form">
+
+    <div class="form-group">
+      <label for="title">Job Title</label>
+      <input id="title" type="text" [ngModel]="title()" (ngModelChange)="title.set($event)" required>
+    </div>
+
+    <div class="form-group">
+      <label for="company">Company</label>
+      <select id="company" [(ngModel)]="companyIdValue" (change)="onCompanyChange(companyIdValue)" required>
+        <option *ngFor="let c of companies" [value]="c.id">{{ c.id }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="location">Location</label>
+      <input id="location" type="text" [ngModel]="location()" (ngModelChange)="location.set($event)" required>
+    </div>
+
+    <div class="form-group">
+      <label for="type">Job Type</label>
+      <input id="type" type="text" [ngModel]="type()" (ngModelChange)="type.set($event)" placeholder="Full-time, Part-time, etc." required>
+    </div>
+
+    <div class="form-group">
+      <label for="salary">Salary</label>
+      <input id="salary" type="text" [ngModel]="salary()" (ngModelChange)="salary.set($event)" placeholder="e.g. ₱20,000 - ₱30,000">
+    </div>
+
+    <div class="form-group">
+      <label for="description">Job Description</label>
+      <textarea id="description" rows="4" [ngModel]="description()" (ngModelChange)="description.set($event)" required></textarea>
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit" class="btn-submit">{{ editingId() ? 'Update Job' : 'Post Job' }}</button>
+      <button type="button" class="btn-cancel" *ngIf="editingId()" (click)="resetForm()">Cancel</button>
+    </div>
+
+  </form>
+
+  <!-- JOB LIST -->
+  <div class="job-list">
+    <h2>Posted Jobs</h2>
+    <div *ngIf="jobs.length === 0" class="empty-jobs">
+      No jobs posted yet.
+    </div>
+
+    <div class="job-card" *ngFor="let job of jobs">
+      <h3>{{ job.title }}</h3>
+      <p class="company">{{ selectedCompanyName }} • {{ job.location }}</p>
+      <p class="type">{{ job.type }}</p>
+      <p class="salary" *ngIf="job.salary">{{ job.salary }}</p>
+      <p class="description">{{ job.description }}</p>
+
+      <div class="actions">
+        <button class="edit" (click)="startEditJob(job)">Edit</button>
+        <button class="delete" (click)="deleteJob(job.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+
+</div>
