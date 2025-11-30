@@ -1,0 +1,32 @@
+.empty-state {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 60px 20px;
+}
+
+.empty-icon {
+  font-size: 48px;
+}
+
+.job-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.company-name {
+  font-size: 14px;
+}
+
+.job-meta .badge {
+  font-weight: 500;
+}
+
+.salary {
+  font-size: 14px;
+}

@@ -1,6 +1,8 @@
 # CommunityJobBoard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.11.
+Feasibility Report: https://docs.google.com/document/d/1Rl5st0PMvctHsCW68rIJzVU0gu5yQaGTzZM9_jKIwaI/edit?pli=1&tab=t.0 
+
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.10.
 
 ## Development server
 

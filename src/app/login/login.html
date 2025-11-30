@@ -1,0 +1,95 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2 class="text-center mb-4">
+      {{ isRegisterMode() ? 'Create Account' : 'Welcome Back' }}
+    </h2>
+    
+    <form (ngSubmit)="onSubmit()">
+      @if (authError()) {
+        <div class="alert alert-danger" role="alert">
+          {{ authError() }}
+        </div>
+      }
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+          placeholder="Enter your email"
+          [disabled]="loading()"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          name="password"
+          placeholder="Enter your password"
+          [disabled]="loading()"
+        >
+      </div>
+
+      @if (isRegisterMode()) {
+        <div class="mb-4">
+          <label class="form-label">I am a...</label>
+          <div class="role-selector">
+            <button 
+              type="button" 
+              class="role-btn"
+              [class.active]="selectedRole() === 'applicant'"
+              (click)="setRole('applicant')"
+              [disabled]="loading()"
+            >
+              <div class="role-icon">👤</div>
+              <div class="role-title">Job Seeker</div>
+              <div class="role-desc">Looking for jobs</div>
+            </button>
+            <button 
+              type="button" 
+              class="role-btn"
+              [class.active]="selectedRole() === 'employer'"
+              (click)="setRole('employer')"
+              [disabled]="loading()"
+            >
+              <div class="role-icon">🏢</div>
+              <div class="role-title">Employer</div>
+              <div class="role-desc">Posting jobs</div>
+            </button>
+          </div>
+        </div>
+      }
+
+      <button 
+        type="submit" 
+        class="btn btn-primary w-100 mb-3"
+        [disabled]="loading()"
+      >
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Please wait...
+        } @else {
+          {{ isRegisterMode() ? 'Sign Up' : 'Login' }}
+        }
+      </button>
+    </form>
+
+    <div class="text-center">
+      <p class="mb-0">
+        {{ isRegisterMode() ? 'Already have an account?' : "Don't have an account?" }}
+        <a href="javascript:void(0)" (click)="toggleMode()" class="text-primary">
+          {{ isRegisterMode() ? 'Login' : 'Sign Up' }}
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,69 +1,96 @@
-<div class="job-container">
-
-  <h1 class="job-header">{{ editingId() ? 'Edit Job' : 'Create Job Posting' }}</h1>
-  <p class="job-subtitle">Post a new job or update an existing one</p>
-
-  <!-- JOB FORM -->
-  <form class="job-form" (ngSubmit)="addJob()" aria-label="Job creation form">
-
-    <div class="form-group">
-      <label for="title">Job Title</label>
-      <input id="title" type="text" [ngModel]="title()" (ngModelChange)="title.set($event)" required>
-    </div>
-
-    <div class="form-group">
-      <label for="company">Company</label>
-      <select id="company" [(ngModel)]="companyIdValue" (change)="onCompanyChange(companyIdValue)" required>
-        <option *ngFor="let c of companies" [value]="c.id">{{ c.id }}</option>
+<h1 class="fw-bold">Post a Job</h1>
+<div class="container-fluid">
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+  
+  <div class="row">
+    <label for="title">Job Title</label>
+    <input type="text" name="job-title" id="" [(ngModel)]="title">
+  </div>
+  <div class="row">
+    <label for="company">Company</label>
+    <input type="text" name="company" id="company" [(ngModel)]="company" [disabled]="isAdmin()" class="form-control">
+  </div>
+  <div class="row">
+    <label for="title">Location</label>
+    <input type="text" name="job-location" id="" [(ngModel)]="location">
+  </div>
+  <div class="row">
+    <label for="type">Type</label>
+    <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
+      <option value="">Select Job Type</option>
+      <option value="Part-Time">Part-Time</option>
+      <option value="Full-Time">Full-Time</option>
+      <option value="Contract">Contract</option>
+      <option value="Remote">Remote</option>
+    </select>
+  </div>
+  <div class="row">
+    <label for="salary-min">Salary Range</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <select name="salary-min" id="salary-min" [(ngModel)]="salaryMin" class="form-control">
+        <option value="">Min Salary</option>
+        @for (option of salaryOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      <span>-</span>
+      <select name="salary-max" id="salary-max" [(ngModel)]="salaryMax" class="form-control">
+        <option value="">Max Salary</option>
+        @for (option of salaryOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
       </select>
     </div>
+  </div>
+  <div class="row">
+    <label for="description">Description</label>
+    <textarea rows="5" class="form-control" name="job-description" [(ngModel)]="description"></textarea>
+   </div>
+  <div class="row">
+    <button (click)="openConfirmModal()">Create Job</button>
+  </div>
+</div>
 
-    <div class="form-group">
-      <label for="location">Location</label>
-      <input id="location" type="text" [ngModel]="location()" (ngModelChange)="location.set($event)" required>
-    </div>
-
-    <div class="form-group">
-      <label for="type">Job Type</label>
-      <input id="type" type="text" [ngModel]="type()" (ngModelChange)="type.set($event)" placeholder="Full-time, Part-time, etc." required>
-    </div>
-
-    <div class="form-group">
-      <label for="salary">Salary</label>
-      <input id="salary" type="text" [ngModel]="salary()" (ngModelChange)="salary.set($event)" placeholder="e.g. ₱20,000 - ₱30,000">
-    </div>
-
-    <div class="form-group">
-      <label for="description">Job Description</label>
-      <textarea id="description" rows="4" [ngModel]="description()" (ngModelChange)="description.set($event)" required></textarea>
-    </div>
-
-    <div class="form-buttons">
-      <button type="submit" class="btn-submit">{{ editingId() ? 'Update Job' : 'Post Job' }}</button>
-      <button type="button" class="btn-cancel" *ngIf="editingId()" (click)="resetForm()">Cancel</button>
-    </div>
-
-  </form>
-
-  <!-- JOB LIST -->
-  <div class="job-list">
-    <h2>Posted Jobs</h2>
-    <div *ngIf="jobs.length === 0" class="empty-jobs">
-      No jobs posted yet.
-    </div>
-
-    <div class="job-card" *ngFor="let job of jobs">
-      <h3>{{ job.title }}</h3>
-      <p class="company">{{ selectedCompanyName }} • {{ job.location }}</p>
-      <p class="type">{{ job.type }}</p>
-      <p class="salary" *ngIf="job.salary">{{ job.salary }}</p>
-      <p class="description">{{ job.description }}</p>
-
-      <div class="actions">
-        <button class="edit" (click)="startEditJob(job)">Edit</button>
-        <button class="delete" (click)="deleteJob(job.id)">Delete</button>
+<!-- Confirmation Modal -->
+@if (showConfirmModal) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Job Posting</h2>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">Job Title:</span>
+          <span class="value">{{ title }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Company:</span>
+          <span class="value">{{ company }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Location:</span>
+          <span class="value">{{ location }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Type:</span>
+          <span class="value">{{ type }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Salary:</span>
+          <span class="value">{{ salary }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Description:</span>
+          <span class="value description-text">{{ description }}</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeConfirmModal()" [disabled]="isSubmitting">Cancel</button>
+        <button class="btn-confirm" (click)="confirmCreateJob()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Creating...' : 'Confirm' }}
+        </button>
       </div>
     </div>
   </div>
+}
 
-</div>

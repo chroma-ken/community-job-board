@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+ font-family: 'Inter', sans-serif;
+ background-color: #f8fafc;
+ color: #334155;
+}
+a {
+ text-decoration: none;
+ transition: opacity 0.2s;
+}
+
+a:hover {
+ opacity: 0.8;
+}
