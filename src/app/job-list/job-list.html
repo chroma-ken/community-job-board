@@ -1,24 +1,37 @@
-<h1 class="fw-bold my-4 text-center">Find Jobs</h1>
-<div class="container-fluid">
-  <div class="row w-100 d-flex justify-content-center gap-2">
-    <div class="col-4">
-      <input type="text" class="form-control" name="job-title" id="job-title" placeholder="Search for Title" [(ngModel)]="jobTitleSearch">
-    </div>
-    <div class="col-3">
-      <input type="text" class="form-control" name="job-location" id="job-location" placeholder="Location (e.g, Manila)" [(ngModel)]="jobLocationSearch">
-    </div>
-    <div class="col-2">
-      <select class="form-control" name="job-type" id="job-type" [(ngModel)]="jobTypeSearch">
-        @for (type of jobTypes; track type.value) {
-          <option [value]="type.value">{{ type.label }}</option>
-        }
-      </select>
-    </div>
-    <div class="col-1">
-      <button class="btn btn-primary w-100" (click)="searchJob()">Search</button>
-    </div>
-    <div class="col-1">
-      <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">Reset</button>
+<h1 class="fw-bold my-3 text-center">Find Jobs</h1>
+<div class="container-fluid mb-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="row g-2 align-items-center search-bar-wrapper">
+        <div class="col-md-4">
+          <div class="input-icon-container">
+            <i class="fas fa-search input-icon"></i> 
+            <input type="text" class="form-control" name="job-title" id="job-title" placeholder="Search for Title" [(ngModel)]="jobTitleSearch">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="input-icon-container">
+            <i class="fas fa-location-dot input-icon"></i> 
+            <input type="text" class="form-control" name="job-location" id="job-location" placeholder="Location (e.g, Manila)" [(ngModel)]="jobLocationSearch">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="input-icon-container">
+            <i class="fas fa-filter input-icon"></i> 
+            <i class="fas fa-chevron-down dropdown-arrow"></i> 
+            <select class="form-control" name="job-type" id="job-type" [(ngModel)]="jobTypeSearch">
+              @for (type of jobTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        
+        <div class="col-md-2 d-flex gap-2 justify-content-end">
+          <button class="btn btn-primary" (click)="searchJob()">Search</button>
+          <button class="btn btn-danger" (click)="resetFilters()">Reset</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -41,7 +54,7 @@
                   (click)="toggleSaveJob(job.id, $event)"
                   [title]="isJobSaved(job.id) ? 'Remove from saved' : 'Save job'"
                 >
-                  {{ isJobSaved(job.id) ? '❤️' : '🤍' }}
+                  {{ isJobSaved(job.id) ? '★' : '☆' }}
                 </button>
               }
             </div>
@@ -55,8 +68,8 @@
           <h2 class="fs-2 fw-bold">{{ jobDetails.title }}</h2>
           <h3 class="fs-5 text-muted">{{ jobDetails.company }}</h3>
           <div class="job-meta my-3">
-            <span class="badge bg-light text-dark me-2">{{ jobDetails.location }}</span>
-            <span class="badge bg-light text-dark me-2">{{ jobDetails.type }}</span>
+            <span class="badge badge-meta me-2">{{ jobDetails.location }}</span>
+            <span class="badge badge-meta me-2">{{ jobDetails.type }}</span>
             <span class="badge bg-success">{{ jobDetails.salary }}</span>
           </div>
           <p class="mt-4">{{ jobDetails.description }}</p>
@@ -65,7 +78,7 @@
             @if (canSaveJobs()) {
               <button 
                 class="btn"
-                [class.btn-outline-danger]="isJobSaved(jobDetails.id)"
+                [class.btn-outline-warning]="isJobSaved(jobDetails.id)"
                 [class.btn-outline-secondary]="!isJobSaved(jobDetails.id)"
                 (click)="toggleSaveJob(jobDetails.id, $event)"
               >
@@ -76,6 +89,7 @@
         </div>
       } @else {
         <div class="empty-details text-center py-5">
+          <i class="fas fa-search empty-details-icon"></i>
           <p class="text-muted">Select a job to view details</p>
         </div>
       }

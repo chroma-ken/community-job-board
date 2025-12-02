@@ -14,8 +14,10 @@ export class Home implements OnInit {
   ngOnInit() {
     const profile = this.authService.userProfile();
     
-    if (profile?.role === 'employer' || profile?.role === 'admin') {
-      this.router.navigate(['/create-job']);
+    if (profile?.role === 'employer') {
+      this.router.navigate(['/employer-jobs']);
+    } else if (profile?.role === 'admin'){
+      this.router.navigate(['/admin'])
     } else {
       this.router.navigate(['/job-list']);
     }

@@ -15,6 +15,9 @@ import { UserRole } from '../models/user.model';
 export class Login implements OnInit, OnDestroy {
   private authService = inject(AuthService);
 
+  firstName = signal('')
+  lastName = signal('')
+  companyName = signal('')
   email = signal('');
   password = signal('');
   selectedRole = signal<UserRole>('applicant');
@@ -50,6 +53,9 @@ export class Login implements OnInit, OnDestroy {
   async onSubmit() {
     const email = this.email();
     const password = this.password();
+    const firstName = this.firstName();
+    const lastName = this.lastName();
+    const companyName = this.companyName();
 
     if (!email || !password) {
       this.authService.authError.set('Please fill in all fields.');
@@ -58,7 +64,7 @@ export class Login implements OnInit, OnDestroy {
 
     let success: boolean;
     if (this.isRegisterMode()) {
-      success = await this.authService.register(email, password, this.selectedRole());
+      success = await this.authService.register(firstName, lastName, companyName, email, password, this.selectedRole());
     } else {
       success = await this.authService.login(email, password);
     }

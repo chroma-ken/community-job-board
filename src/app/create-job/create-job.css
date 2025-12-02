@@ -1,22 +1,24 @@
 .container-fluid {
     max-width: 700px;
-    margin: 40px auto;
+    margin: 20px auto; 
     background: white;
     padding: 40px;
-    border-radius: 12px;
+    border-radius: 16px; 
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     border: 1px solid #e2e8f0;
+    font-family: 'Poppins', sans-serif; 
    }
    
    h1 {
+    font-family: Poppins;
     text-align: center;
-    color: #0f172a;
-    margin-bottom: 30px;
+    color: #051a49;
+    margin-bottom: 10px;
     font-size: 2rem;
    }
    
    .row {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     display: flex;
     flex-direction: column;
    }
@@ -28,26 +30,55 @@
     font-size: 0.95rem;
    }
    
-   input[type="text"] {
+   .input-icon-container {
+      position: relative;
+      width: 100%;
+   }
+
+   .input-icon {
+      position: absolute;
+      left: 30px;
+      top: 50%; 
+      transform: translateY(-50%);
+      color: #64748b; 
+      font-size: 1.1rem;
+      z-index: 2;
+      margin-top: 2px; 
+   }
+
+   .input-peso {
+       font-family: 'Poppins', sans-serif;
+       font-weight: 700;
+       font-size: 1.2rem;
+       color: #64748b; 
+       margin-top: 0px; 
+   }
+
+   input[type="text"], .form-control, textarea {
     width: 100%;
-    padding: 12px;
+    padding: 12px 12px 12px 12px; 
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     font-size: 1rem;
     background-color: #fff;
     transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Poppins', sans-serif;
+   }
+
+   .input-icon-container .form-control {
+       padding-left: 65px; 
    }
    
-   input[type="text"]:focus {
+   input[type="text"]:focus, .form-control:focus, textarea:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #3b82f6; 
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
    }
    
    button {
     width: 100%;
     padding: 14px;
-    background-color: #3b82f6;
+    background-color: #1a417e; 
     color: white;
     font-weight: 600;
     border: none;
@@ -56,18 +87,15 @@
     cursor: pointer;
     margin-top: 10px;
     transition: background-color 0.2s;
+    font-family: 'Poppins', sans-serif;
    }
    
-   button:hover {
-    background-color: #2563eb;
+   button:hover:not(:disabled) {
+    background-color: #051a49;
    }
    
    textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-family: inherit;
+    resize: vertical;
    }
 
    .alert {
@@ -82,7 +110,6 @@
     border: 1px solid #fecaca;
    }
 
-   /* Modal Styles */
    .modal-overlay {
     position: fixed;
     top: 0;
@@ -98,12 +125,13 @@
 
    .modal-content {
     background-color: white;
-    border-radius: 12px;
+    border-radius: 16px; 
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     max-width: 500px;
     width: 90%;
     padding: 0;
     overflow: hidden;
+    font-family: 'Poppins', sans-serif; 
    }
 
    .modal-content h2 {
@@ -111,7 +139,7 @@
     margin: 0;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #0f172a;
+    color: #051a49;
     border-bottom: 1px solid #e2e8f0;
    }
 
@@ -135,7 +163,7 @@
    }
 
    .detail-row .value {
-    color: #0f172a;
+    color: #475569;
     flex: 1;
     word-break: break-word;
    }
@@ -157,28 +185,29 @@
    .btn-confirm {
     padding: 10px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px; 
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    font-family: 'Poppins', sans-serif;
    }
 
    .btn-cancel {
-    background-color: #e2e8f0;
-    color: #475569;
+    background-color: #e43547;
+    color: #fdfdfd;
    }
 
    .btn-cancel:hover:not(:disabled) {
-    background-color: #cbd5e1;
+    background-color: #b32332;
    }
 
    .btn-confirm {
-    background-color: #10b981;
+    background-color: #1f57bf; 
     color: white;
    }
 
    .btn-confirm:hover:not(:disabled) {
-    background-color: #059669;
+    background-color: #19489f;
    }
 
    button:disabled {

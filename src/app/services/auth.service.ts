@@ -74,7 +74,7 @@ export class AuthService {
     }
   }
 
-  async register(email: string, password: string, role: UserRole): Promise<boolean> {
+  async register(firstName: string, lastName: string, companyName: string, email: string, password: string, role: UserRole): Promise<boolean> {
     this.loading.set(true);
     this.authError.set(null);
     
@@ -83,6 +83,9 @@ export class AuthService {
       
       const userProfile: UserProfile = {
         uid: credential.user.uid,
+        firstName: firstName,
+        lastName: lastName,
+        company: companyName,
         email: email,
         role: role,
         savedJobs: [],

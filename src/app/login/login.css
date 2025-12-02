@@ -2,22 +2,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 70vh;
+  min-height: calc(100vh - 60px - 40px);
   padding: 20px;
 }
 
 .login-card {
+  font-family: 'Poppins';
   background: white;
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 480px;
+  max-width: 450px;
 }
 
 .login-card h2 {
-  color: #1a1a2e;
-  font-weight: 600;
+  color: #051a49;
+  font-weight: 800;
 }
 
 .form-control {
@@ -28,21 +29,22 @@
 }
 
 .form-control:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #021de6; 
+  box-shadow: 0 0 0 3px rgba(2, 10, 230, 0.2); 
 }
 
 .btn-primary {
+  font-family: 'Poppins';
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 15px;
   font-weight: 500;
-  background-color: #1a1a2e;
-  border-color: #1a1a2e;
+  background-color: #1a417e; 
+  border-color: #1a417e;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #2d2d4a;
-  border-color: #2d2d4a;
+  background-color: #051a49; 
+  border-color: #051a49;
 }
 
 .btn-primary:disabled {
@@ -51,7 +53,7 @@
 }
 
 .text-primary {
-  color: #3b82f6 !important;
+  color: #e60278 !important; 
   text-decoration: none;
   font-weight: 500;
 }
@@ -67,9 +69,9 @@
 
 .role-btn {
   flex: 1;
-  padding: 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   background: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -77,13 +79,13 @@
 }
 
 .role-btn:hover:not(:disabled) {
-  border-color: #3b82f6;
-  background: #f8fafc;
+  border-color: #0228e6;
+  background: #d1d4f7;
 }
 
 .role-btn.active {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: #d1d4f7; 
+  background: #d1d4f7; 
 }
 
 .role-btn:disabled {
@@ -92,17 +94,20 @@
 }
 
 .role-icon {
-  font-size: 28px;
+  font-family: 'Poppins';
+  font-size: 24px;
   margin-bottom: 8px;
 }
 
 .role-title {
+  font-family: 'Poppins';
   font-weight: 600;
-  color: #1a1a2e;
+  color: #051a49;
   margin-bottom: 4px;
 }
 
 .role-desc {
+  font-family: 'Poppins';
   font-size: 12px;
-  color: #6b7280;
+  color: #455263;
 }

@@ -1,15 +1,57 @@
 <div class="login-container">
   <div class="login-card">
     <h2 class="text-center mb-4">
-      {{ isRegisterMode() ? 'Create Account' : 'Welcome Back' }}
+      {{ isRegisterMode() ? 'Create Account' : 'Welcome Back!' }}
     </h2>
-    
+
     <form (ngSubmit)="onSubmit()">
       @if (authError()) {
         <div class="alert alert-danger" role="alert">
           {{ authError() }}
         </div>
       }
+    
+    <div *ngIf="isRegisterMode() && selectedRole() === 'applicant'" class="mb-4">
+      <label for="firstName" class="form-label">First Name</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="firstName" 
+          [ngModel]="firstName()"
+          (ngModelChange)="firstName.set($event)"
+          name="email"
+          placeholder="Enter your Last Name"
+          [disabled]="loading()"
+        >
+    </div>
+
+    <div *ngIf="isRegisterMode() && selectedRole() === 'applicant'" class="mb-4">
+      <label for="lastName" class="form-label">Last Name</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="lastName" 
+          [ngModel]="lastName()"
+          (ngModelChange)="lastName.set($event)"
+          name="email"
+          placeholder="Enter your Last Name"
+          [disabled]="loading()"
+        >
+    </div>
+
+    <div *ngIf="isRegisterMode() && selectedRole() === 'employer'" class="mb-4">
+      <label for="companyName" class="form-label">Company Name</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="companyName" 
+          [ngModel]="companyName()"
+          (ngModelChange)="companyName.set($event)"
+          name="email"
+          placeholder="Enter your Company Name"
+          [disabled]="loading()"
+        >
+    </div>
 
       <div class="mb-3">
         <label for="email" class="form-label">Email address</label>

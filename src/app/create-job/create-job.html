@@ -6,25 +6,37 @@
   
   <div class="row">
     <label for="title">Job Title</label>
-    <input type="text" name="job-title" id="" [(ngModel)]="title">
+    <div class="input-icon-container">
+      <i class="fas fa-briefcase input-icon"></i>
+      <input type="text" name="job-title" id="title" [(ngModel)]="title" class="form-control" placeholder="Enter job title">
+    </div>
   </div>
   <div class="row">
     <label for="company">Company</label>
-    <input type="text" name="company" id="company" [(ngModel)]="company" [disabled]="isAdmin()" class="form-control">
+    <div class="input-icon-container">
+      <i class="fas fa-building input-icon"></i>
+      <input type="text" name="company" id="company" [(ngModel)]="company" [disabled]="isAdmin()" class="form-control" placeholder="Enter company name">
+    </div>
   </div>
   <div class="row">
-    <label for="title">Location</label>
-    <input type="text" name="job-location" id="" [(ngModel)]="location">
+    <label for="location">Location</label>
+    <div class="input-icon-container">
+      <i class="fas fa-location-dot input-icon"></i>
+      <input type="text" name="job-location" id="location" [(ngModel)]="location" class="form-control" placeholder="Enter city or region">
+    </div>
   </div>
   <div class="row">
     <label for="type">Type</label>
-    <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
-      <option value="">Select Job Type</option>
-      <option value="Part-Time">Part-Time</option>
-      <option value="Full-Time">Full-Time</option>
-      <option value="Contract">Contract</option>
-      <option value="Remote">Remote</option>
-    </select>
+    <div class="input-icon-container">
+        <i class="fas fa-tag input-icon"></i> 
+        <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
+          <option value="">Select Job Type</option>
+          <option value="Part-Time">Part-Time</option>
+          <option value="Full-Time">Full-Time</option>
+          <option value="Contract">Contract</option>
+          <option value="Remote">Remote</option>
+        </select>
+    </div>
   </div>
   <div class="row">
     <label for="salary-min">Salary Range</label>
@@ -49,11 +61,10 @@
     <textarea rows="5" class="form-control" name="job-description" [(ngModel)]="description"></textarea>
    </div>
   <div class="row">
-    <button (click)="openConfirmModal()">Create Job</button>
+    <button (click)="openConfirmModal()">Post Job</button>
   </div>
 </div>
 
-<!-- Confirmation Modal -->
 @if (showConfirmModal) {
   <div class="modal-overlay">
     <div class="modal-content">
@@ -85,12 +96,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeConfirmModal()" [disabled]="isSubmitting">Cancel</button>
         <button class="btn-confirm" (click)="confirmCreateJob()" [disabled]="isSubmitting">
           {{ isSubmitting ? 'Creating...' : 'Confirm' }}
         </button>
+        <button class="btn-cancel" (click)="closeConfirmModal()" [disabled]="isSubmitting">Cancel</button>
       </div>
     </div>
   </div>
 }
-
