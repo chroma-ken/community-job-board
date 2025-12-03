@@ -6,14 +6,21 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
+import { browserLocalPersistence, setPersistence } from 'firebase/auth';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes), 
-    provideFirebaseApp(() => initializeApp(environment.firebase)), 
-    provideAuth(() => getAuth()), 
+    provideRouter(routes),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => {
+      const auth = getAuth();
+      setPersistence(auth, browserLocalPersistence).catch(err => {
+        console.error('Error setting auth persistence:', err);
+      });
+      return auth;
+    }),
     provideFirestore(() => getFirestore())
   ]
 };

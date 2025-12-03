@@ -11,6 +11,7 @@
       @if (authService.isLoggedIn()) {
         @if (authService.isApplicant()) {
           <a class="nav-link text-white" routerLink="/saved-jobs">Saved Jobs</a>
+          <a class="nav-link text-white" routerLink="/applied-jobs">Applied Jobs</a>
         }
         
         @if (authService.isEmployer()) {
@@ -20,9 +21,14 @@
         
         @if (authService.isAdmin()) {
           <a class="nav-link" routerLink="/admin">Jobs Management</a>
+          <a class="nav-link" routerLink="/user-management">User Management</a>
         }
 
         <div class="navbar-user-info ms-2">
+          <a class="nav-link text-white" routerLink="/profile">
+            <i class="fas fa-user-circle me-1"></i>
+            Profile
+          </a>
           <span class="badge bg-secondary">{{ authService.userProfile()?.role }}</span>
           <span class="text-white-50 small">{{ authService.currentUser()?.email }}</span>
           <button class="btn btn-outline-light btn-sm" (click)="authService.logout()">Logout</button>

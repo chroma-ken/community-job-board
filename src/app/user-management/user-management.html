@@ -1,0 +1,240 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>User Management</h2>
+    <span class="badge bg-dark">{{ allUsers().length }} Total Users | {{ filteredUsers().length }} Filtered</span>
+  </div>
+
+  @if (actionMessage()) {
+    <div
+      class="alert"
+      [class.alert-success]="actionMessage()?.type === 'success'"
+      [class.alert-danger]="actionMessage()?.type === 'error'"
+    >
+      {{ actionMessage()?.text }}
+    </div>
+  }
+
+  <div class="mb-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <div class="row g-2 align-items-center search-bar-wrapper">
+          <div class="col-md-4">
+            <div class="input-icon-container">
+              <i class="fas fa-envelope input-icon"></i>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search by Email"
+                [(ngModel)]="searchEmail"
+              >
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="input-icon-container">
+              <i class="fas fa-user-tag input-icon"></i>
+              <select class="form-control" [(ngModel)]="searchRole">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="employer">Employer</option>
+                <option value="applicant">Applicant</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-danger" (click)="resetFilters()">
+              Reset Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  } @else {
+    @if (paginatedUsers().length === 0) {
+      <div class="alert alert-info text-center">
+        @if (filteredUsers().length === 0 && (searchEmail() || searchRole())) {
+          No users found matching your search criteria.
+        } @else {
+          No users available.
+        }
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Name/Company</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of paginatedUsers(); track user.uid) {
+              <tr>
+                <td>{{ user.email }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getRoleBadgeClass(user.role)">{{ user.role }}</span>
+                </td>
+                <td>
+                  @if (user.firstName && user.lastName) {
+                    {{ user.firstName }} {{ user.lastName }}
+                  } @else if (user.company) {
+                    {{ user.company }}
+                  } @else {
+                    N/A
+                  }
+                </td>
+                <td>{{ user.createdAt | date: 'short' }}</td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-outline-primary me-1"
+                    (click)="selectUser(user)"
+                  >
+                    View
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    title="Delete User"
+                    (click)="openDeleteConfirm(user.uid)"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div>
+          <label class="me-2">Rows per page:</label>
+          <select class="form-select d-inline-block" style="width: auto;" (change)="changePageSize($any($event.target).value)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size" [selected]="pageSize() === size">{{ size }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="pagination m-0">
+          <button
+            class="btn btn-outline-primary me-1"
+            (click)="previousPage()"
+            [disabled]="currentPage() === 1"
+          >
+            Previous
+          </button>
+
+          <div class="btn-group" role="group">
+            @for (page of [].constructor(totalPages()); track $index) {
+              <button
+                type="button"
+                class="btn"
+                [class.btn-primary]="currentPage() === $index + 1"
+                [class.btn-outline-primary]="currentPage() !== $index + 1"
+                (click)="goToPage($index + 1)"
+              >
+                {{ $index + 1 }}
+              </button>
+            }
+          </div>
+
+          <button
+            class="btn btn-outline-primary ms-1"
+            (click)="nextPage()"
+            [disabled]="currentPage() === totalPages()"
+          >
+            Next
+          </button>
+        </div>
+
+        <div>
+          <small class="text-muted">Page {{ currentPage() }} of {{ totalPages() }}</small>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+@if (selectedUser()) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User Details</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="fw-bold">Email:</label>
+          <p>{{ selectedUser()?.email }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="fw-bold">Role:</label>
+          <p>
+            <span class="badge" [ngClass]="getRoleBadgeClass(selectedUser()!.role)">
+              {{ selectedUser()?.role }}
+            </span>
+          </p>
+        </div>
+        @if (selectedUser()?.firstName && selectedUser()?.lastName) {
+          <div class="mb-3">
+            <label class="fw-bold">Name:</label>
+            <p>{{ selectedUser()?.firstName }} {{ selectedUser()?.lastName }}</p>
+          </div>
+        }
+        @if (selectedUser()?.company) {
+          <div class="mb-3">
+            <label class="fw-bold">Company:</label>
+            <p>{{ selectedUser()?.company }}</p>
+          </div>
+        }
+        <div class="mb-3">
+          <label class="fw-bold">User ID:</label>
+          <p class="text-muted small">{{ selectedUser()?.uid }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="fw-bold">Created:</label>
+          <p>{{ selectedUser()?.createdAt | date: 'medium' }}</p>
+        </div>
+        @if (selectedUser()?.savedJobs && selectedUser()!.savedJobs!.length > 0) {
+          <div class="mb-3">
+            <label class="fw-bold">Saved Jobs:</label>
+            <p>{{ selectedUser()!.savedJobs!.length }} jobs saved</p>
+          </div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" (click)="openDeleteConfirm(selectedUser()!.uid)">
+          Delete User
+        </button>
+        <button class="btn btn-secondary" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showDeleteConfirmModal) {
+  <div class="modal-backdrop" (click)="closeDeleteConfirm()"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <h2>Confirm Deletion</h2>
+      <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDeleteConfirm()">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}

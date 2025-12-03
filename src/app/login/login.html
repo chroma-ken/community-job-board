@@ -19,8 +19,8 @@
           id="firstName" 
           [ngModel]="firstName()"
           (ngModelChange)="firstName.set($event)"
-          name="email"
-          placeholder="Enter your Last Name"
+          name="firstName"
+          placeholder="Enter your First Name"
           [disabled]="loading()"
         >
     </div>
@@ -33,7 +33,7 @@
           id="lastName" 
           [ngModel]="lastName()"
           (ngModelChange)="lastName.set($event)"
-          name="email"
+          name="lastName"
           placeholder="Enter your Last Name"
           [disabled]="loading()"
         >
@@ -69,16 +69,27 @@
 
       <div class="mb-3">
         <label for="password" class="form-label">Password</label>
-        <input 
-          type="password" 
-          class="form-control" 
-          id="password" 
-          [ngModel]="password()"
-          (ngModelChange)="password.set($event)"
-          name="password"
-          placeholder="Enter your password"
-          [disabled]="loading()"
-        >
+        <div class="input-group">
+          <input 
+            [type]="showPassword() ? 'text' : 'password'"
+            class="form-control" 
+            id="password" 
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            name="password"
+            placeholder="Enter your password"
+            [disabled]="loading()"
+          >
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary"
+            (click)="showPassword.set(!showPassword())"
+            [disabled]="loading()"
+            aria-label="Toggle password visibility"
+          >
+            <i class="fas" [ngClass]="showPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </button>
+        </div>
       </div>
 
       @if (isRegisterMode()) {
@@ -109,6 +120,26 @@
             </button>
           </div>
         </div>
+
+        <div class="form-check mb-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="terms"
+            [ngModel]="acceptedTerms()"
+            (ngModelChange)="acceptedTerms.set($event)"
+            name="terms"
+            [disabled]="loading()"
+          >
+          <label class="form-check-label" for="terms">
+            @if (selectedRole() === 'applicant') {
+              I confirm that I am of legal age to use this platform (job seekers must be 18 or older) and I agree to the
+            } @else {
+              I agree to the
+            }
+            <a href="javascript:void(0)" (click)="showTerms.set(true)">Terms and Conditions</a>.
+          </label>
+        </div>
       }
 
       <button 
@@ -123,7 +154,83 @@
           {{ isRegisterMode() ? 'Sign Up' : 'Login' }}
         }
       </button>
+      
+      @if (!isRegisterMode()) {
+        <div class="text-end mb-3">
+          <button 
+            type="button" 
+            class="btn btn-link p-0"
+            (click)="onForgotPassword()"
+            [disabled]="resetInProgress() || loading()"
+          >
+            {{ resetInProgress() ? 'Sending reset email...' : 'Forgot password?' }}
+          </button>
+        </div>
+      }
     </form>
+
+    @if (showTerms()) {
+      <div class="modal-overlay">
+        <div class="modal-content modal-lg">
+          <h4>Terms and Conditions</h4>
+          <p class="text-muted small mb-3">
+            Please read these Terms and Conditions carefully before creating an account.
+          </p>
+          <div class="terms-body">
+            <h6>1. Eligibility</h6>
+            <p>
+              By creating a job seeker account, you confirm that you are at least 18 years old. Employers confirm they are
+              authorized to post jobs and represent their organization.
+            </p>
+
+            <h6>2. Use of the Platform</h6>
+            <p>
+              You agree to provide accurate information in your profile and job listings, and not to post misleading,
+              fraudulent, or inappropriate content.
+            </p>
+
+            <h6>3. Data & Privacy</h6>
+            <p>
+              Your profile information and job listings may be visible to other users of the platform. Do not share
+              sensitive personal information (e.g., government IDs, bank details) through this site.
+            </p>
+
+            <h6>4. Prohibited Activities</h6>
+            <p>
+              You agree not to use the platform to harass, discriminate, or otherwise harm other users, and not to
+              attempt to circumvent security or misuse the service.
+            </p>
+
+            <h6>5. Changes to These Terms</h6>
+            <p>
+              These Terms may be updated over time. Continued use of the platform after changes are posted constitutes
+              acceptance of the updated Terms.
+            </p>
+          </div>
+
+          <div class="modal-footer mt-3">
+            <button class="btn btn-secondary" (click)="showTerms.set(false)">Close</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showResetConfirmation()) {
+      <div class="modal-overlay">
+        <div class="modal-content modal-lg">
+          <h4>Password Reset Email Sent</h4>
+          <p class="mt-3">
+            If an account exists for <strong>{{ email() }}</strong>, a password reset link has been sent to that address.
+          </p>
+          <p class="text-muted small">
+            Please check your inbox (and spam folder). Follow the link in the email to create a new password.
+          </p>
+          <div class="modal-footer mt-3">
+            <button class="btn btn-secondary" (click)="showResetConfirmation.set(false)">Close</button>
+          </div>
+        </div>
+      </div>
+    }
 
     <div class="text-center">
       <p class="mb-0">

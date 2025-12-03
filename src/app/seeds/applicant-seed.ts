@@ -52,7 +52,6 @@ export class ApplicantSeedService {
         }
       }
       
-      await signOut(this.auth);
       console.log('%c=== APPLICANT TEST ACCOUNTS ===', 'color: blue; font-size: 14px; font-weight: bold;');
       console.log(`Password: ${APPLICANT_PASSWORD}`);
       APPLICANT_SEED_DATA.forEach(app => console.log(`${app.name}: ${app.email}`));

@@ -43,7 +43,6 @@ export class AdminSeedService {
         }
       }
       
-      await signOut(this.auth);
       console.log('%c=== ADMIN TEST ACCOUNT ===', 'color: red; font-size: 14px; font-weight: bold;');
       console.log(`Email: admin@example.com`);
       console.log(`Password: ${ADMIN_PASSWORD}`);

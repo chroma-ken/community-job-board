@@ -7,6 +7,19 @@
       } @else if (jobs.length === 0) {
         <p class="text-muted">You haven't posted any jobs yet.</p>
       } @else {
+        <div class="mb-3">
+          <label class="form-label fw-bold">Sort By:</label>
+          <select class="form-select" [(ngModel)]="sortBy" (change)="onSortChange()">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="title-desc">Title (Z-A)</option>
+            <option value="status-asc">Status (A-Z)</option>
+            <option value="status-desc">Status (Z-A)</option>
+            <option value="applicants-desc">Most Applicants</option>
+            <option value="applicants-asc">Least Applicants</option>
+          </select>
+        </div>
         <div class="job-list">
           @for (job of jobs; track job.id) {
             <div class="job-item" [class.active]="selectedJob?.id === job.id" (click)="viewJob(job)">
@@ -51,10 +64,48 @@
                   <div class="applicant-item card mb-2 p-3">
                     <div class="d-flex justify-content-between align-items-start">
                       <div>
-                        <p class="fw-bold mb-1">{{ applicant.email }}</p>
+                        <p class="fw-bold mb-1">{{ applicant.name || applicant.email }}</p>
+                        <p class="text-muted small mb-0">{{ applicant.email }}</p>
                         <p class="text-muted small mb-0">
                           Applied: {{ applicant.appliedAt | date: 'short' }}
                         </p>
+                        @if (applicant.status) {
+                          <p class="small mt-1">
+                            <span class="badge"
+                                  [ngClass]="{
+                                    'bg-success': applicant.status === 'accepted',
+                                    'bg-danger': applicant.status === 'rejected',
+                                    'bg-warning text-dark': applicant.status === 'pending'
+                                  }">
+                              {{ applicant.status | titlecase }}
+                            </span>
+                          </p>
+                        }
+                      </div>
+                      <div class="d-flex gap-2">
+                        <button 
+                          class="btn btn-sm btn-outline-primary"
+                          title="View applicant details"
+                          (click)="openApplicantModal(applicant)"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button 
+                          class="btn btn-sm btn-outline-success"
+                          title="Accept applicant"
+                          (click)="acceptApplicant(applicant)"
+                          [disabled]="applicant.status === 'accepted'"
+                        >
+                          <i class="fas fa-check"></i>
+                        </button>
+                        <button 
+                          class="btn btn-sm btn-outline-danger"
+                          title="Reject applicant"
+                          (click)="openRejectConfirm(applicant)"
+                          [disabled]="applicant.status === 'rejected'"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -81,6 +132,108 @@
     </div>
   </div>
 </div>
+
+@if (selectedApplicant && selectedJob) {
+  <div class="modal-overlay">
+    <div class="modal-content modal-lg">
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 class="modal-title">Applicant Details</h5>
+        <button type="button" class="btn-close" (click)="closeApplicantModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="applicant-header mb-4 p-3 bg-light rounded">
+          <div class="d-flex align-items-center gap-3">
+            <div class="applicant-avatar">
+              <i class="fas fa-user-circle fa-3x text-primary"></i>
+            </div>
+            <div>
+              <h4 class="mb-1">{{ selectedApplicant.name || (selectedApplicantProfile?.firstName ? (selectedApplicantProfile?.firstName || '') + ' ' + (selectedApplicantProfile?.lastName || '') : selectedApplicant.email) }}</h4>
+              <p class="mb-0 text-muted">{{ selectedApplicant.email }}</p>
+              <span class="badge mt-2"
+                    [ngClass]="{
+                      'bg-success': selectedApplicant.status === 'accepted',
+                      'bg-danger': selectedApplicant.status === 'rejected',
+                      'bg-warning text-dark': !selectedApplicant.status || selectedApplicant.status === 'pending'
+                    }">
+                {{ (selectedApplicant.status || 'pending') | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>Profile Information</h6>
+            <div class="mb-3">
+              <label class="fw-bold small text-muted">Applied On:</label>
+              <p class="mb-0">{{ selectedApplicant.appliedAt | date: 'medium' }}</p>
+            </div>
+            @if (selectedApplicantProfile?.location) {
+              <div class="mb-3">
+                <label class="fw-bold small text-muted">Location:</label>
+                <p class="mb-0">{{ selectedApplicantProfile?.location }}</p>
+              </div>
+            }
+            @if (selectedApplicantProfile?.phone) {
+              <div class="mb-3">
+                <label class="fw-bold small text-muted">Phone:</label>
+                <p class="mb-0">{{ selectedApplicantProfile?.phone }}</p>
+              </div>
+            }
+            @if (selectedApplicantProfile?.website) {
+              <div class="mb-3">
+                <label class="fw-bold small text-muted">Website:</label>
+                <p class="mb-0"><a [href]="selectedApplicantProfile?.website" target="_blank">{{ selectedApplicantProfile?.website }}</a></p>
+              </div>
+            }
+            @if (selectedApplicantProfile?.headline) {
+              <div class="mb-3">
+                <label class="fw-bold small text-muted">Headline:</label>
+                <p class="mb-0">{{ selectedApplicantProfile?.headline }}</p>
+              </div>
+            }
+            @if (selectedApplicantProfile?.bio) {
+              <div class="mb-3">
+                <label class="fw-bold small text-muted">Bio:</label>
+                <p class="mb-0">{{ selectedApplicantProfile?.bio }}</p>
+              </div>
+            }
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-bold text-primary mb-3"><i class="fas fa-question-circle me-2"></i>Application Questions & Answers</h6>
+            @if (selectedApplicant.responses && selectedApplicant.responses.length > 0) {
+              @for (response of selectedApplicant.responses; track $index) {
+                <div class="qa-item mb-3 p-3 border rounded">
+                  <p class="fw-bold mb-2 text-dark"><i class="fas fa-question me-2 text-primary"></i>{{ response.question }}</p>
+                  <p class="mb-0 ps-4"><i class="fas fa-reply me-2 text-muted"></i>{{ response.answer }}</p>
+                </div>
+              }
+            } @else {
+              <p class="text-muted fst-italic">No application responses provided.</p>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button 
+          class="btn btn-success"
+          (click)="acceptApplicant(selectedApplicant)"
+          [disabled]="selectedApplicant.status === 'accepted'"
+        >
+          <i class="fas fa-check me-1"></i> Accept
+        </button>
+        <button 
+          class="btn btn-danger"
+          (click)="openRejectConfirm(selectedApplicant)"
+          [disabled]="selectedApplicant.status === 'rejected'"
+        >
+          <i class="fas fa-times me-1"></i> Reject
+        </button>
+        <button class="btn btn-secondary" (click)="closeApplicantModal()">Close</button>
+      </div>
+    </div>
+  </div>
+}
 
 @if (showEditModal && editingJob) {
   <div class="modal-overlay">
@@ -167,6 +320,44 @@
         <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
           {{ isDeleting ? 'Deleting...' : 'Delete' }}
         </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showRejectConfirmModal) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Rejection</h5>
+        <button type="button" class="btn-close" (click)="closeRejectConfirm()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to reject this applicant?</p>
+        <p class="text-muted small">They will be removed from the applicants list.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeRejectConfirm()">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmRejectApplicant()">
+          <i class="fas fa-times me-1"></i> Reject Applicant
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showAlertModal) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 class="modal-title"><i class="fas fa-info-circle text-primary me-2"></i>Notice</h5>
+        <button type="button" class="btn-close" (click)="closeAlertModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ alertMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="closeAlertModal()">OK</button>
       </div>
     </div>
   </div>

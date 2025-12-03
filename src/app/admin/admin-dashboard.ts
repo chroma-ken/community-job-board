@@ -19,6 +19,13 @@ export class AdminDashboard implements OnInit {
   loading = signal(false);
   actionMessage = signal<{type: 'success' | 'error', text: string} | null>(null);
 
+  // Confirmation modal
+  showConfirmModal = false;
+  confirmModalTitle = '';
+  confirmModalMessage = '';
+  confirmModalAction: (() => Promise<void>) | null = null;
+  jobToAction: Job | null = null;
+
   // Search filters
   searchTitle = signal<string>('');
   searchCompany = signal<string>('');
@@ -120,24 +127,49 @@ export class AdminDashboard implements OnInit {
     }
   }
 
-  async rejectJob(job: Job) {
-    const confirmed = confirm(`Are you sure you want to reject "${job.title}"?`);
-    if (confirmed && job.id) {
-      await this.jobsService.delete(job.id);
-      this.loadJobs();
-      this.showMessage('success', `Job "${job.title}" has been removed.`);
-      this.closeModal();
-    }
+  openRejectConfirm(job: Job) {
+    this.jobToAction = job;
+    this.confirmModalTitle = 'Reject Job';
+    this.confirmModalMessage = `Are you sure you want to reject "${job.title}"?`;
+    this.confirmModalAction = async () => {
+      if (this.jobToAction?.id) {
+        await this.jobsService.delete(this.jobToAction.id);
+        this.loadJobs();
+        this.showMessage('success', `Job "${this.jobToAction.title}" has been removed.`);
+        this.closeModal();
+      }
+    };
+    this.showConfirmModal = true;
   }
 
-  async deleteJob(job: Job) {
-    const confirmed = confirm(`Are you sure you want to delete "${job.title}"? This action cannot be undone.`);
-    if (confirmed && job.id) {
-      await this.jobsService.delete(job.id);
-      this.loadJobs();
-      this.showMessage('success', `Job "${job.title}" has been deleted.`);
-      this.closeModal();
+  openDeleteConfirm(job: Job) {
+    this.jobToAction = job;
+    this.confirmModalTitle = 'Delete Job';
+    this.confirmModalMessage = `Are you sure you want to delete "${job.title}"? This action cannot be undone.`;
+    this.confirmModalAction = async () => {
+      if (this.jobToAction?.id) {
+        await this.jobsService.delete(this.jobToAction.id);
+        this.loadJobs();
+        this.showMessage('success', `Job "${this.jobToAction.title}" has been deleted.`);
+        this.closeModal();
+      }
+    };
+    this.showConfirmModal = true;
+  }
+
+  closeConfirmModal() {
+    this.showConfirmModal = false;
+    this.confirmModalTitle = '';
+    this.confirmModalMessage = '';
+    this.confirmModalAction = null;
+    this.jobToAction = null;
+  }
+
+  async executeConfirmAction() {
+    if (this.confirmModalAction) {
+      await this.confirmModalAction();
     }
+    this.closeConfirmModal();
   }
 
   showMessage(type: 'success' | 'error', text: string) {

@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc, collection } from '@angular/fire/firestore';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User, updateEmail as fbUpdateEmail, updatePassword as fbUpdatePassword, sendPasswordResetEmail } from '@angular/fire/auth';
+import { Firestore, doc, setDoc, getDoc, collection, updateDoc } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { UserProfile, UserRole } from '../models/user.model';
 
@@ -53,6 +53,21 @@ export class AuthService {
     }
   }
 
+  async getUserProfile(uid: string): Promise<UserProfile | null> {
+    try {
+      const userDocRef = doc(this.firestore, 'users', uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        return userDoc.data() as UserProfile;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      return null;
+    }
+  }
+
   async login(email: string, password: string): Promise<boolean> {
     this.loading.set(true);
     this.authError.set(null);
@@ -94,9 +109,15 @@ export class AuthService {
       
       await setDoc(doc(this.firestore, 'users', credential.user.uid), userProfile);
       this.userProfile.set(userProfile);
-      
+
       this.clearError();
-      this.router.navigate(['/']);
+
+      if (role === 'applicant') {
+        this.router.navigate(['/profile']);
+      } else {
+        this.router.navigate(['/']);
+      }
+
       return true;
     } catch (error: any) {
       this.authError.set(this.getErrorMessage(error.code));
@@ -135,6 +156,69 @@ export class AuthService {
 
   clearError(): void {
     this.authError.set(null);
+  }
+
+  async updateUserProfile(uid: string, data: Partial<UserProfile & {
+    headline?: string;
+    bio?: string;
+    location?: string;
+    website?: string;
+    phone?: string;
+  }>): Promise<void> {
+    try {
+      const userDocRef = doc(this.firestore, 'users', uid);
+      await updateDoc(userDocRef, data as any);
+
+      const current = this.userProfile();
+      if (current) {
+        this.userProfile.set({
+          ...current,
+          ...data
+        });
+      }
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
+    }
+  }
+
+  async updateEmail(newEmail: string): Promise<void> {
+    const user = this.currentUser();
+    if (!user) throw new Error('No authenticated user.');
+
+    try {
+      await fbUpdateEmail(user, newEmail);
+
+      const profile = this.userProfile();
+      if (profile) {
+        await this.updateUserProfile(profile.uid, { email: newEmail });
+      }
+    } catch (error) {
+      console.error('Error updating email:', error);
+      throw error;
+    }
+  }
+
+  async updatePassword(newPassword: string): Promise<void> {
+    const user = this.currentUser();
+    if (!user) throw new Error('No authenticated user.');
+
+    try {
+      await fbUpdatePassword(user, newPassword);
+    } catch (error) {
+      console.error('Error updating password:', error);
+      throw error;
+    }
+  }
+
+  async sendPasswordReset(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error: any) {
+      console.error('Error sending password reset email:', error);
+      this.authError.set(this.getErrorMessage(error.code || error.message));
+      throw error;
+    }
   }
 
   private getErrorMessage(code: string): string {

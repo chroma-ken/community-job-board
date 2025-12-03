@@ -66,7 +66,6 @@ export class EmployerSeedService {
       // Now map jobs to correct employers AFTER all accounts are created
       await this.mapJobsToCorrectEmployers();
       
-      await signOut(this.auth);
       console.log('%c=== EMPLOYER TEST ACCOUNTS ===', 'color: green; font-size: 14px; font-weight: bold;');
       console.log(`Password: ${EMPLOYER_PASSWORD}`);
       EMPLOYER_SEED_DATA.forEach(emp => console.log(`${emp.company}: ${emp.email}`));

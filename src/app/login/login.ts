@@ -22,6 +22,11 @@ export class Login implements OnInit, OnDestroy {
   password = signal('');
   selectedRole = signal<UserRole>('applicant');
   isRegisterMode = signal(false);
+  showPassword = signal(false);
+  acceptedTerms = signal(false);
+  showTerms = signal(false);
+  showResetConfirmation = signal(false);
+  resetInProgress = signal(false);
 
   loading = this.authService.loading;
   authError = this.authService.authError;
@@ -44,10 +49,32 @@ export class Login implements OnInit, OnDestroy {
     this.email.set('');
     this.password.set('');
     this.selectedRole.set('applicant');
+    this.acceptedTerms.set(false);
+    this.showTerms.set(false);
   }
 
   setRole(role: UserRole) {
     this.selectedRole.set(role);
+  }
+
+  async onForgotPassword() {
+    const email = this.email().trim();
+    this.authService.clearError();
+
+    if (!email) {
+      this.authService.authError.set('Please enter your email address to reset your password.');
+      return;
+    }
+
+    this.resetInProgress.set(true);
+    try {
+      await this.authService.sendPasswordReset(email);
+      this.showResetConfirmation.set(true);
+    } catch {
+      // error message already set in authService
+    } finally {
+      this.resetInProgress.set(false);
+    }
   }
 
   async onSubmit() {
@@ -60,6 +87,15 @@ export class Login implements OnInit, OnDestroy {
     if (!email || !password) {
       this.authService.authError.set('Please fill in all fields.');
       return;
+    }
+
+    if (this.isRegisterMode()) {
+      // Terms and conditions must be accepted for all sign ups
+      if (!this.acceptedTerms()) {
+        this.authService.authError.set('You must agree to the Terms and Conditions to create an account.');
+        return;
+      }
+
     }
 
     let success: boolean;

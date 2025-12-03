@@ -263,5 +263,56 @@ h1{
 
 p{
   font-family: Poppins;
-  font-size: 1.15rem; 
+  font-size: 1.15rem;
+}
+
+.response-item {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.modal-lg {
+  max-width: 800px !important;
+  width: 90%;
+}
+
+.applicant-header {
+  background-color: #f8f9fa;
+}
+
+.applicant-avatar {
+  flex-shrink: 0;
+}
+
+.applicant-header h4 {
+  font-weight: 600;
+  color: #051a49;
+  margin: 0;
+}
+
+.qa-item {
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.qa-item:hover {
+  background-color: #f0f4f9;
+  border-color: #3b82f6 !important;
+}
+
+.qa-item p:first-child {
+  font-size: 0.95rem;
+}
+
+.qa-item p:last-child {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.modal-body h6 {
+  font-size: 1rem;
+  border-bottom: 2px solid #3b82f6;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
 }

@@ -11,4 +11,9 @@ export interface UserProfile {
   company?: string;
   savedJobs?: string[];
   createdAt: Date;
+  location?: string;
+  website?: string;
+  phone?: string;
+  bio?: string;
+  headline?: string;
 }

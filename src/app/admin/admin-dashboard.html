@@ -112,7 +112,7 @@
                   <button 
                     class="btn btn-sm btn-outline-danger" 
                     title="Permanently Delete Job"
-                    (click)="deleteJob(job)"
+                    (click)="openDeleteConfirm(job)"
                   >
                     Delete
                   </button>
@@ -211,12 +211,31 @@
         <button class="btn btn-success" (click)="approveJob(selectedJob()!)">
           Approve
         </button>
-        <button class="btn btn-warning" (click)="rejectJob(selectedJob()!)">
+        <button class="btn btn-warning" (click)="openRejectConfirm(selectedJob()!)">
           Reject
         </button>
-        <button class="btn btn-danger" (click)="deleteJob(selectedJob()!)">
+        <button class="btn btn-danger" (click)="openDeleteConfirm(selectedJob()!)">
           Delete
         </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showConfirmModal) {
+  <div class="modal-backdrop" (click)="closeConfirmModal()"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>{{ confirmModalTitle }}</h5>
+        <button type="button" class="btn-close" (click)="closeConfirmModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ confirmModalMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeConfirmModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="executeConfirmAction()">Confirm</button>
       </div>
     </div>
   </div>

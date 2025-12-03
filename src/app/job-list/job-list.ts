@@ -23,6 +23,20 @@ export class JobList implements OnInit {
   jobTypeSearch = "";
 
   jobDetails: Job | null = null;
+  showApplicationModal = false;
+  isSubmitting = false;
+  showConfirmation = false;
+  applicationResponses: { question: string; answer: string }[] = [];
+
+  showAlertModal = false;
+  alertMessage = '';
+
+  applicationQuestions = [
+    { question: 'Why are you interested in this position?', required: true },
+    { question: 'What relevant experience do you have?', required: true },
+    { question: 'What are your salary expectations?', required: false },
+    { question: 'When are you available to start?', required: true }
+  ];
 
   jobTypes = [
     { value: "", label: "All Job Types" },
@@ -98,15 +112,65 @@ export class JobList implements OnInit {
       return;
     }
 
-    const success = await this.jobService.applyJob(jobId);
+    this.applicationResponses = this.applicationQuestions.map(q => ({
+      question: q.question,
+      answer: ''
+    }));
+
+    this.showApplicationModal = true;
+    this.showConfirmation = false;
+  }
+
+  closeApplicationModal() {
+    this.showApplicationModal = false;
+    this.showConfirmation = false;
+    this.applicationResponses = [];
+  }
+
+  showAlert(message: string) {
+    this.alertMessage = message;
+    this.showAlertModal = true;
+  }
+
+  closeAlertModal() {
+    this.showAlertModal = false;
+    this.alertMessage = '';
+  }
+
+  async submitApplication() {
+    const requiredQuestions = this.applicationQuestions.filter(q => q.required);
+    const allRequiredAnswered = requiredQuestions.every((q, index) => {
+      const response = this.applicationResponses.find(r => r.question === q.question);
+      return response && response.answer.trim().length > 0;
+    });
+
+    if (!allRequiredAnswered) {
+      this.showAlert('Please answer all required questions.');
+      return;
+    }
+
+    const jobId = this.jobDetails?.id;
+    if (!jobId) {
+      this.showAlert('Unable to submit application. Please try again.');
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    const success = await this.jobService.applyJob(jobId, this.applicationResponses);
+
+    this.isSubmitting = false;
+
     if (success) {
-      alert('Successfully applied to the job!');
-      // Refresh the job details to show the application
+      this.showConfirmation = true;
+      await this.jobService.loadJobs();
+      this.jobs = this.jobService.list(this.filters);
       if (this.jobDetails?.id === jobId) {
         this.viewJob(jobId);
       }
     } else {
-      alert('Failed to apply. You may have already applied to this job.');
+      this.showAlert('Failed to apply. You may have already applied to this job.');
+      this.closeApplicationModal();
     }
   }
 }

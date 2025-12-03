@@ -123,6 +123,31 @@ export class JobsService {
     return this.jobs().find(j => j.id === id);
   }
 
+  async getAllJobs(): Promise<Job[]> {
+    try {
+      const jobsCollection = collection(this.firestore, 'jobs');
+      const snapshot = await getDocs(jobsCollection);
+
+      const allJobs: Job[] = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          postedDate: data['postedDate']?.toDate ? data['postedDate'].toDate() : data['postedDate'],
+          applicants: (data['applicants'] || []).map((app: any) => ({
+            ...app,
+            appliedAt: app.appliedAt?.toDate ? app.appliedAt.toDate() : app.appliedAt
+          }))
+        } as Job;
+      });
+
+      return allJobs;
+    } catch (error) {
+      console.error('Error loading all jobs:', error);
+      return [];
+    }
+  }
+
   async create(job: Omit<Job, 'id'>): Promise<Job | null> {
     try {
       const jobsCollection = collection(this.firestore, 'jobs');
@@ -277,29 +302,118 @@ export class JobsService {
     }
   }
 
-  async applyJob(jobId: string): Promise<boolean> {
+  async applyJob(jobId: string, responses?: { question: string; answer: string }[]): Promise<boolean> {
     const user = this.authService.currentUser();
     if (!user) return false;
 
     try {
       const jobDocRef = doc(this.firestore, 'jobs', jobId);
+      const jobSnapshot = await getDoc(jobDocRef);
+
+      if (!jobSnapshot.exists()) {
+        console.error('Job not found:', jobId);
+        return false;
+      }
+
+      const existingApplicants = (jobSnapshot.data()['applicants'] || []) as any[];
+      const alreadyApplied = existingApplicants.some(app => app.userId === user.uid);
+
+      if (alreadyApplied) {
+        console.warn('User has already applied to this job');
+        return false;
+      }
+
+      const userProfile = await this.authService.getUserProfile(user.uid);
+      const applicantName = userProfile 
+        ? `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() 
+        : '';
+
       const applicant = {
         userId: user.uid,
         email: user.email,
-        appliedAt: Timestamp.now()
+        name: applicantName || user.email,
+        appliedAt: Timestamp.now(),
+        status: 'pending',
+        responses: responses || []
       };
 
       await updateDoc(jobDocRef, {
         applicants: arrayUnion(applicant)
       });
-      
-      // Auto-save the job when applicant applies
+
       await this.saveJob(jobId);
-      
+
       console.log('Successfully applied to job:', jobId);
       return true;
     } catch (error) {
       console.error('Error applying to job:', error);
+      return false;
+    }
+  }
+
+  async updateApplicantStatus(
+    jobId: string,
+    applicantUserId: string,
+    status: 'accepted' | 'rejected'
+  ): Promise<boolean> {
+    try {
+      const jobDocRef = doc(this.firestore, 'jobs', jobId);
+      const snapshot = await getDoc(jobDocRef);
+
+      if (!snapshot.exists()) {
+        console.error('Job not found when updating applicant status:', jobId);
+        return false;
+      }
+
+      const data = snapshot.data();
+      const applicants = (data['applicants'] || []) as any[];
+
+      const updatedApplicants = applicants.map(applicant => {
+        if (applicant.userId === applicantUserId) {
+          return {
+            ...applicant,
+            status
+          };
+        }
+        return applicant;
+      });
+
+      await updateDoc(jobDocRef, {
+        applicants: updatedApplicants
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error updating applicant status:', error);
+      return false;
+    }
+  }
+
+  async removeApplicant(jobId: string, applicantUserId: string): Promise<boolean> {
+    try {
+      const jobDocRef = doc(this.firestore, 'jobs', jobId);
+      const snapshot = await getDoc(jobDocRef);
+
+      if (!snapshot.exists()) {
+        console.error('Job not found when removing applicant:', jobId);
+        return false;
+      }
+
+      const data = snapshot.data();
+      const applicants = (data['applicants'] || []) as any[];
+
+      const updatedApplicants = applicants.filter(
+        applicant => applicant.userId !== applicantUserId
+      );
+
+      await updateDoc(jobDocRef, {
+        applicants: updatedApplicants
+      });
+
+      console.log('Successfully removed applicant from job:', jobId);
+      return true;
+    } catch (error) {
+      console.error('Error removing applicant:', error);
       return false;
     }
   }
