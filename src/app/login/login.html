@@ -1,0 +1,244 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2 class="text-center mb-4">
+      {{ isRegisterMode() ? 'Create Account' : 'Welcome Back!' }}
+    </h2>
+
+    <form (ngSubmit)="onSubmit()">
+      @if (authError()) {
+        <div class="alert alert-danger" role="alert">
+          {{ authError() }}
+        </div>
+      }
+    
+    <div *ngIf="isRegisterMode() && selectedRole() === 'applicant'" class="mb-4">
+      <label for="firstName" class="form-label">First Name</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="firstName" 
+          [ngModel]="firstName()"
+          (ngModelChange)="firstName.set($event)"
+          name="firstName"
+          placeholder="Enter your First Name"
+          [disabled]="loading()"
+        >
+    </div>
+
+    <div *ngIf="isRegisterMode() && selectedRole() === 'applicant'" class="mb-4">
+      <label for="lastName" class="form-label">Last Name</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="lastName" 
+          [ngModel]="lastName()"
+          (ngModelChange)="lastName.set($event)"
+          name="lastName"
+          placeholder="Enter your Last Name"
+          [disabled]="loading()"
+        >
+    </div>
+
+    <div *ngIf="isRegisterMode() && selectedRole() === 'employer'" class="mb-4">
+      <label for="companyName" class="form-label">Company Name</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="companyName" 
+          [ngModel]="companyName()"
+          (ngModelChange)="companyName.set($event)"
+          name="email"
+          placeholder="Enter your Company Name"
+          [disabled]="loading()"
+        >
+    </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+          placeholder="Enter your email"
+          [disabled]="loading()"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <input 
+            [type]="showPassword() ? 'text' : 'password'"
+            class="form-control" 
+            id="password" 
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            name="password"
+            placeholder="Enter your password"
+            [disabled]="loading()"
+          >
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary"
+            (click)="showPassword.set(!showPassword())"
+            [disabled]="loading()"
+            aria-label="Toggle password visibility"
+          >
+            <i class="fas" [ngClass]="showPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </button>
+        </div>
+      </div>
+
+      @if (isRegisterMode()) {
+        <div class="mb-4">
+          <label class="form-label">I am a...</label>
+          <div class="role-selector">
+            <button 
+              type="button" 
+              class="role-btn"
+              [class.active]="selectedRole() === 'applicant'"
+              (click)="setRole('applicant')"
+              [disabled]="loading()"
+            >
+              <div class="role-icon">👤</div>
+              <div class="role-title">Job Seeker</div>
+              <div class="role-desc">Looking for jobs</div>
+            </button>
+            <button 
+              type="button" 
+              class="role-btn"
+              [class.active]="selectedRole() === 'employer'"
+              (click)="setRole('employer')"
+              [disabled]="loading()"
+            >
+              <div class="role-icon">🏢</div>
+              <div class="role-title">Employer</div>
+              <div class="role-desc">Posting jobs</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-check mb-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="terms"
+            [ngModel]="acceptedTerms()"
+            (ngModelChange)="acceptedTerms.set($event)"
+            name="terms"
+            [disabled]="loading()"
+          >
+          <label class="form-check-label" for="terms">
+            @if (selectedRole() === 'applicant') {
+              I confirm that I am of legal age to use this platform (job seekers must be 18 or older) and I agree to the
+            } @else {
+              I agree to the
+            }
+            <a href="javascript:void(0)" (click)="showTerms.set(true)">Terms and Conditions</a>.
+          </label>
+        </div>
+      }
+
+      <button 
+        type="submit" 
+        class="btn btn-primary w-100 mb-3"
+        [disabled]="loading()"
+      >
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Please wait...
+        } @else {
+          {{ isRegisterMode() ? 'Sign Up' : 'Login' }}
+        }
+      </button>
+      
+      @if (!isRegisterMode()) {
+        <div class="text-end mb-3">
+          <button 
+            type="button" 
+            class="btn btn-link p-0"
+            (click)="onForgotPassword()"
+            [disabled]="resetInProgress() || loading()"
+          >
+            {{ resetInProgress() ? 'Sending reset email...' : 'Forgot password?' }}
+          </button>
+        </div>
+      }
+    </form>
+
+    @if (showTerms()) {
+      <div class="modal-overlay">
+        <div class="modal-content modal-lg">
+          <h4>Terms and Conditions</h4>
+          <p class="text-muted small mb-3">
+            Please read these Terms and Conditions carefully before creating an account.
+          </p>
+          <div class="terms-body">
+            <h6>1. Eligibility</h6>
+            <p>
+              By creating a job seeker account, you confirm that you are at least 18 years old. Employers confirm they are
+              authorized to post jobs and represent their organization.
+            </p>
+
+            <h6>2. Use of the Platform</h6>
+            <p>
+              You agree to provide accurate information in your profile and job listings, and not to post misleading,
+              fraudulent, or inappropriate content.
+            </p>
+
+            <h6>3. Data & Privacy</h6>
+            <p>
+              Your profile information and job listings may be visible to other users of the platform. Do not share
+              sensitive personal information (e.g., government IDs, bank details) through this site.
+            </p>
+
+            <h6>4. Prohibited Activities</h6>
+            <p>
+              You agree not to use the platform to harass, discriminate, or otherwise harm other users, and not to
+              attempt to circumvent security or misuse the service.
+            </p>
+
+            <h6>5. Changes to These Terms</h6>
+            <p>
+              These Terms may be updated over time. Continued use of the platform after changes are posted constitutes
+              acceptance of the updated Terms.
+            </p>
+          </div>
+
+          <div class="modal-footer mt-3">
+            <button class="btn btn-secondary" (click)="showTerms.set(false)">Close</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showResetConfirmation()) {
+      <div class="modal-overlay">
+        <div class="modal-content modal-lg">
+          <h4>Password Reset Email Sent</h4>
+          <p class="mt-3">
+            If an account exists for <strong>{{ email() }}</strong>, a password reset link has been sent to that address.
+          </p>
+          <p class="text-muted small">
+            Please check your inbox (and spam folder). Follow the link in the email to create a new password.
+          </p>
+          <div class="modal-footer mt-3">
+            <button class="btn btn-secondary" (click)="showResetConfirmation.set(false)">Close</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <div class="text-center">
+      <p class="mb-0">
+        {{ isRegisterMode() ? 'Already have an account?' : "Don't have an account?" }}
+        <a href="javascript:void(0)" (click)="toggleMode()" class="text-primary">
+          {{ isRegisterMode() ? 'Login' : 'Sign Up' }}
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

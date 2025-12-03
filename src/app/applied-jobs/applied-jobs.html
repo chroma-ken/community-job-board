@@ -1,0 +1,43 @@
+<div class="container py-4">
+  <h2 class="mb-4 fw-bold">Applied Jobs</h2>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  } @else if (appliedJobs().length === 0) {
+    <div class="empty-state text-center py-5">
+      <div class="empty-icon mb-3">
+        <i class="fas fa-briefcase empty-state-icon"></i>
+      </div>
+      <h4>No applied jobs yet</h4>
+      <p class="text-muted">Jobs you apply to will appear here</p>
+      <a routerLink="/job-list" class="btn btn-primary btn-lg">Browse Jobs</a>
+    </div>
+  } @else {
+    <div class="row">
+      @for (job of appliedJobs(); track job.id) {
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card job-card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ job.title }}</h5>
+              <p class="company-name text-muted mb-2">{{ job.company }}</p>
+              <div class="job-meta mb-3">
+                <span class="badge badge-meta me-2">{{ job.location }}</span>
+                <span class="badge badge-meta">{{ job.type }}</span>
+              </div>
+              <p class="salary text-success fw-bold">{{ job.salary }}</p>
+              <div class="mt-3">
+                <span class="badge" [ngClass]="getStatusBadgeClass(job.applicationStatus)">
+                  Application: {{ job.applicationStatus | titlecase }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

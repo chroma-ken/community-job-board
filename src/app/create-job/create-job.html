@@ -1,0 +1,106 @@
+<h1 class="fw-bold">Post a Job</h1>
+<div class="container-fluid">
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+  
+  <div class="row">
+    <label for="title">Job Title</label>
+    <div class="input-icon-container">
+      <i class="fas fa-briefcase input-icon"></i>
+      <input type="text" name="job-title" id="title" [(ngModel)]="title" class="form-control" placeholder="Enter job title">
+    </div>
+  </div>
+  <div class="row">
+    <label for="company">Company</label>
+    <div class="input-icon-container">
+      <i class="fas fa-building input-icon"></i>
+      <input type="text" name="company" id="company" [(ngModel)]="company" [disabled]="isAdmin()" class="form-control" placeholder="Enter company name">
+    </div>
+  </div>
+  <div class="row">
+    <label for="location">Location</label>
+    <div class="input-icon-container">
+      <i class="fas fa-location-dot input-icon"></i>
+      <input type="text" name="job-location" id="location" [(ngModel)]="location" class="form-control" placeholder="Enter city or region">
+    </div>
+  </div>
+  <div class="row">
+    <label for="type">Type</label>
+    <div class="input-icon-container">
+        <i class="fas fa-tag input-icon"></i> 
+        <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
+          <option value="">Select Job Type</option>
+          <option value="Part-Time">Part-Time</option>
+          <option value="Full-Time">Full-Time</option>
+          <option value="Contract">Contract</option>
+          <option value="Remote">Remote</option>
+        </select>
+    </div>
+  </div>
+  <div class="row">
+    <label for="salary-min">Salary Range</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <select name="salary-min" id="salary-min" [(ngModel)]="salaryMin" class="form-control">
+        <option value="">Min Salary</option>
+        @for (option of salaryOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      <span>-</span>
+      <select name="salary-max" id="salary-max" [(ngModel)]="salaryMax" class="form-control">
+        <option value="">Max Salary</option>
+        @for (option of salaryOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <label for="description">Description</label>
+    <textarea rows="5" class="form-control" name="job-description" [(ngModel)]="description" placeholder="Enter Job Description, Necessary Skills, Experiences/Education Requirements, etc." ></textarea>
+   </div>
+  <div class="row">
+    <button (click)="openConfirmModal()">Post Job</button>
+  </div>
+</div>
+
+@if (showConfirmModal) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Job Posting</h2>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">Job Title:</span>
+          <span class="value">{{ title }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Company:</span>
+          <span class="value">{{ company }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Location:</span>
+          <span class="value">{{ location }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Type:</span>
+          <span class="value">{{ type }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Salary:</span>
+          <span class="value">{{ salary }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Description:</span>
+          <span class="value description-text">{{ description }}</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-confirm" (click)="confirmCreateJob()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Creating...' : 'Confirm' }}
+        </button>
+        <button class="btn-cancel" (click)="closeConfirmModal()" [disabled]="isSubmitting">Cancel</button>
+      </div>
+    </div>
+  </div>
+}

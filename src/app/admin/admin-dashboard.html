@@ -1,0 +1,242 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Admin Dashboard</h2>
+    <span class="badge bg-dark">{{ allJobs().length }} Total Jobs | {{ filteredJobs().length }} Filtered</span>
+  </div>
+
+  @if (actionMessage()) {
+    <div 
+      class="alert" 
+      [class.alert-success]="actionMessage()?.type === 'success'"
+      [class.alert-danger]="actionMessage()?.type === 'error'"
+    >
+      {{ actionMessage()?.text }}
+    </div>
+  }
+
+  <div class="mb-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <div class="row g-2 align-items-center search-bar-wrapper">
+          <div class="col-md-3">
+            <div class="input-icon-container">
+              <i class="fas fa-search input-icon"></i> 
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Search by Title"
+                [(ngModel)]="searchTitle"
+              >
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="input-icon-container">
+              <i class="fas fa-building input-icon"></i> 
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Search by Company"
+                [(ngModel)]="searchCompany"
+              >
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="input-icon-container">
+              <i class="fas fa-location-dot input-icon"></i> 
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Search by Location"
+                [(ngModel)]="searchLocation"
+              >
+            </div>
+          </div>
+          
+          <div class="col-md-3">
+            <button class="btn btn-danger" (click)="resetFilters()">
+              Reset Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  } @else {
+    @if (paginatedJobs().length === 0) {
+      <div class="alert alert-info text-center">
+        @if (filteredJobs().length === 0 && (searchTitle() || searchCompany() || searchLocation())) {
+          No jobs found matching your search criteria.
+        } @else {
+          No jobs available.
+        }
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Company</th>
+              <th>Location</th>
+              <th>Type</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (job of paginatedJobs(); track job.id) {
+              <tr>
+                <td class="text-truncate" style="max-width: 80px; font-size: 0.85rem;">{{ job.id }}</td>
+                <td>
+                  <strong>{{ job.title }}</strong>
+                </td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.location }}</td>
+                <td>
+                  <span class="badge badge-meta">{{ job.type }}</span>
+                </td>
+                <td>
+                  <button 
+                    class="btn btn-sm btn-outline-primary me-1" 
+                    (click)="selectJob(job)"
+                  >
+                    View
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-outline-danger" 
+                    title="Permanently Delete Job"
+                    (click)="openDeleteConfirm(job)"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div>
+          <label class="me-2">Rows per page:</label>
+          <select class="form-select d-inline-block" style="width: auto;" (change)="changePageSize($any($event.target).value)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size" [selected]="pageSize() === size">{{ size }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="pagination m-0">
+          <button 
+            class="btn btn-outline-primary me-1"
+            (click)="previousPage()"
+            [disabled]="currentPage() === 1"
+          >
+            Previous
+          </button>
+
+          <div class="btn-group" role="group">
+            @for (page of [].constructor(totalPages()); track $index) {
+              <button 
+                type="button" 
+                class="btn"
+                [class.btn-primary]="currentPage() === $index + 1"
+                [class.btn-outline-primary]="currentPage() !== $index + 1"
+                (click)="goToPage($index + 1)"
+              >
+                {{ $index + 1 }}
+              </button>
+            }
+          </div>
+
+          <button 
+            class="btn btn-outline-primary ms-1"
+            (click)="nextPage()"
+            [disabled]="currentPage() === totalPages()"
+          >
+            Next
+          </button>
+        </div>
+
+        <div>
+          <small class="text-muted">Page {{ currentPage() }} of {{ totalPages() }}</small>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+@if (selectedJob()) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ selectedJob()?.title }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="fw-bold">Company:</label>
+          <p>{{ selectedJob()?.company }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="fw-bold">Location:</label>
+          <p>{{ selectedJob()?.location }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="fw-bold">Type:</label>
+          <p>{{ selectedJob()?.type }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="fw-bold">Salary:</label>
+          <p class="text-success">{{ selectedJob()?.salary }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="fw-bold">Description:</label>
+          <p>{{ selectedJob()?.description }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="fw-bold">Status:</label>
+          <p>{{ selectedJob()?.status || 'N/A' }}</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" (click)="approveJob(selectedJob()!)">
+          Approve
+        </button>
+        <button class="btn btn-warning" (click)="openRejectConfirm(selectedJob()!)">
+          Reject
+        </button>
+        <button class="btn btn-danger" (click)="openDeleteConfirm(selectedJob()!)">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showConfirmModal) {
+  <div class="modal-backdrop" (click)="closeConfirmModal()"></div>
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>{{ confirmModalTitle }}</h5>
+        <button type="button" class="btn-close" (click)="closeConfirmModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ confirmModalMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeConfirmModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="executeConfirmAction()">Confirm</button>
+      </div>
+    </div>
+  </div>
+}

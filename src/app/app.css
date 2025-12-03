@@ -1,0 +1,60 @@
+nav.navbar {
+    height: var(--navbar-height);
+    background-color: var(--primary-color) !important; 
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-logo h1 { 
+    font-size: 1.75rem; 
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.nav-link { 
+    color: rgb(221, 221, 221) !important; 
+    font-size: 0.95rem; 
+    font-weight: 500;
+    padding: 8px 16px !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 20px;
+    margin-left: 20px;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    height: 40px;
+}
+
+.navbar-user-info span {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.login-btn {
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    font-weight: 600;
+    padding: 8px 24px;
+    background: transparent;
+}
+.login-btn:hover {
+    background: white;
+    color: var(--primary-color);
+    border-color: white;
+}
