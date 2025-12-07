@@ -214,3 +214,86 @@
     opacity: 0.6;
     cursor: not-allowed;
    }
+
+   /* Dropdown container */
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 10;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 12px;
+  transition: all 0.2s;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-menu .form-check {
+  margin-bottom: 0.5rem;
+}
+
+.dropdown-menu .form-check-label {
+  word-break: break-word;
+  cursor: pointer;
+}
+
+.dropdown-menu .btn-outline-danger {
+  flex-shrink: 0; /* prevent button from stretching */
+  height: 28px;
+  width: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+/* Selected Questions */
+.selected-questions .card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 8px 12px;
+}
+
+.selected-questions .card span {
+  flex-grow: 1;
+}
+
+.selected-questions .card .btn {
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.dropdown-container button i {
+  transition: transform 0.2s;
+}
+
+/* Rotate arrow when dropdown is open */
+.dropdown-container .dropdown-menu.show + button i,
+.dropdown-container button:focus i {
+  transform: rotate(180deg);
+}
+
+
+
+
+
+
+   
