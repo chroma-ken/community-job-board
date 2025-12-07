@@ -34,7 +34,6 @@ export class JobList implements OnInit {
   applicationQuestions = [
     { question: 'Why are you interested in this position?', required: true },
     { question: 'What relevant experience do you have?', required: true },
-    { question: 'What are your salary expectations?', required: false },
     { question: 'When are you available to start?', required: true }
   ];
 

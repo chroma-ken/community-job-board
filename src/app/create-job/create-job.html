@@ -31,8 +31,17 @@
         <i class="fas fa-tag input-icon"></i> 
         <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
           <option value="">Select Job Type</option>
-          <option value="Part-Time">Part-Time</option>
-          <option value="Full-Time">Full-Time</option>
+          <option value="Part-Time">Part-Time (Onsite)</option>
+          <option value="Full-Time">Full-Time (Onsite)</option>
+
+          <option value="Full-Time-Remote">Full-Time(Remote)</option>
+          <option value="Part-Time-Remote">Part-Time(Remote)</option>
+
+          <option value="Hybrid-1">Hybrid (1 day onsite (Monday) / WFH for the rest of the week)</option>
+          <option value="Hybrid-2">Hybrid (2 days onsite (Tue & Thursday) / WFH for the rest of the week)</option>
+          <option value="Hybrid-3">Hybrid (3 days onsite (Monday, Wednesday & Friday) / WFH for the rest of the week)</option>
+          
+          <option value="Hybrid">Hybrid</option>
           <option value="Contract">Contract</option>
           <option value="Remote">Remote</option>
         </select>
