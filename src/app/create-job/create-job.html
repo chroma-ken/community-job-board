@@ -73,14 +73,22 @@
   </div>
 
   <!-- Description -->
-  <div class="row">
-    <label for="description">Description</label>
-    <textarea rows="5" class="form-control" name="job-description" [(ngModel)]="description"></textarea>
-  </div>
+<div class="row mb-3">
+  <label for="description">Description</label>
+  <textarea
+    rows="5"
+    class="form-control"
+    name="job-description"
+    [(ngModel)]="description"
+    (input)="formatBullets()"
+    placeholder="Type - or * for bullets, press Enter for new line">
+  </textarea>
+</div>
+
 
   <!-- Application Questions -->
   <div class="row mt-3">
-    <label class="section-label">Application Questions</label>
+    <label class="section-label">Interview Questions</label>
 
     <!-- Dropdown -->
     <div class="dropdown-container w-100 position-relative">
@@ -102,12 +110,12 @@
         <!-- Add Custom Question -->
         <div class="d-flex mt-3">
           <input type="text" class="form-control me-2 flex-grow-1" placeholder="Add your own question..." [(ngModel)]="newDropdownQuestion" (keydown.enter)="addCustomDropdownQuestion()">
-          <button type="button" class="btn btn-primary" (click)="addCustomDropdownQuestion()">Add</button>
+          <button type="button" class="btn btn-primary" (click)="addCustomDropdownQuestion()">Add your own question</button>
         </div>
 
         <!-- Add Selected Questions Button -->
         <div class="text-end mt-3">
-          <button type="button" class="btn btn-success" (click)="addSelectedQuestionsToForm()">Add Selected</button>
+          <button type="button" class="btn btn-success" (click)="addSelectedQuestionsToForm()">Enter</button>
         </div>
       </div>
     </div>

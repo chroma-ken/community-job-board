@@ -8,7 +8,7 @@ import { EMPLOYER_SEED_DATA } from '../seeds/employer-seed';
 
 @Component({
   selector: 'app-create-job',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,],
   templateUrl: './create-job.html',
   styleUrl: './create-job.css',
 })
@@ -54,6 +54,8 @@ export class CreateJob implements OnInit {
     { text: 'Where do you see yourself in 5 years?', selected: false },
     { text: 'What motivates you?', selected: false },
   ];
+
+  
 
   newDropdownQuestion = '';
   showDropdown = false;
@@ -175,6 +177,23 @@ export class CreateJob implements OnInit {
     } finally {
       this.isSubmitting = false;
     }
+  }
+
+  formatBullets() {
+    // Split textarea content by lines
+    const lines = this.description.split('\n');
+
+    // Transform lines starting with "-" or "*" into bullets
+    const formattedLines = lines.map(line => {
+      line = line.trim();
+      if (line.startsWith('- ') || line.startsWith('* ')) {
+        return '• ' + line.substring(2).trim();
+      }
+      return line;
+    });
+
+    // Join back and update description without moving cursor
+    this.description = formattedLines.join('\n');
   }
 }
 ``
