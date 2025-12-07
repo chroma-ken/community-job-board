@@ -97,14 +97,19 @@ export class CreateJob implements OnInit {
     }
   }
 
-  addSelectedQuestionsToForm() {
-    this.dropdownQuestions.forEach(q => {
-      if (q.selected && !this.applicationQuestions.some(aq => aq.question === q.text)) {
+ addSelectedQuestionsToForm() {
+  this.dropdownQuestions.forEach(q => {
+    if (q.selected) {
+      // Avoid duplicate questions
+      const exists = this.applicationQuestions.some(aq => aq.question === q.text);
+      if (!exists) {
         this.applicationQuestions.push({ question: q.text });
-        q.selected = false; // reset checkbox
       }
-    });
-  }
+      q.selected = false; // reset checkbox
+    }
+  });
+  this.showDropdown = false; // close dropdown after adding
+}
 
   removeQuestion(index: number) {
     this.applicationQuestions.splice(index, 1);
