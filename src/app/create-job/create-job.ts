@@ -43,6 +43,20 @@ export class CreateJob implements OnInit {
     { value: 300000, label: '₱300,000+' },
   ];
 
+  // Add this inside the class
+applicationQuestions: { question: string }[] = [];
+
+// Add new question input
+addQuestion() {
+  this.applicationQuestions.push({ question: '' });
+}
+
+// Remove a question by index
+removeQuestion(index: number) {
+  this.applicationQuestions.splice(index, 1);
+}
+
+
   ngOnInit() {
     // Get company from user profile or derive from email
     const profile = this.authService.userProfile();
@@ -129,6 +143,7 @@ export class CreateJob implements OnInit {
       description: this.description,
       salary: this.salary,
       postedBy: userId,
+      applicationQuestions: this.applicationQuestions.map(q => ({ question: q.question, answer: '' }))
     };
 
     try {

@@ -3,7 +3,7 @@
   @if (error) {
     <div class="alert alert-danger">{{ error }}</div>
   }
-  
+
   <div class="row">
     <label for="title">Job Title</label>
     <div class="input-icon-container">
@@ -11,6 +11,7 @@
       <input type="text" name="job-title" id="title" [(ngModel)]="title" class="form-control" placeholder="Enter job title">
     </div>
   </div>
+
   <div class="row">
     <label for="company">Company</label>
     <div class="input-icon-container">
@@ -18,6 +19,7 @@
       <input type="text" name="company" id="company" [(ngModel)]="company" [disabled]="isAdmin()" class="form-control" placeholder="Enter company name">
     </div>
   </div>
+
   <div class="row">
     <label for="location">Location</label>
     <div class="input-icon-container">
@@ -25,29 +27,27 @@
       <input type="text" name="job-location" id="location" [(ngModel)]="location" class="form-control" placeholder="Enter city or region">
     </div>
   </div>
+
   <div class="row">
     <label for="type">Type</label>
     <div class="input-icon-container">
-        <i class="fas fa-tag input-icon"></i> 
-        <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
-           <option value="">Select Job Type</option>
-          <option value="Part-Time">Part-Time (Onsite)</option>
-          <option value="Full-Time">Full-Time (Onsite)</option>
-
-          <option value="Full-Time-Remote">Full-Time(Remote)</option>
-          <option value="Part-Time-Remote">Part-Time(Remote)</option>
-
-          <option value="Hybrid-1">Hybrid (1 day onsite (Monday) / WFH for the rest of the week)</option>
-          <option value="Hybrid-2">Hybrid (2 days onsite (Tue & Thursday) / WFH for the rest of the week)</option>
-          <option value="Hybrid-3">Hybrid (3 days onsite (Monday, Wednesday & Friday) / WFH for the rest of the week)</option>
-          
-          <option value="Hybrid">Hybrid</option>
-          <option value="Contract">Contract</option>
-          <option value="Remote">Remote</option>
-         
-        </select>
+      <i class="fas fa-tag input-icon"></i> 
+      <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
+        <option value="">Select Job Type</option>
+        <option value="Part-Time">Part-Time (Onsite)</option>
+        <option value="Full-Time">Full-Time (Onsite)</option>
+        <option value="Full-Time-Remote">Full-Time(Remote)</option>
+        <option value="Part-Time-Remote">Part-Time(Remote)</option>
+        <option value="Hybrid-1">Hybrid (1 day onsite / WFH rest of the week)</option>
+        <option value="Hybrid-2">Hybrid (2 days onsite / WFH rest of the week)</option>
+        <option value="Hybrid-3">Hybrid (3 days onsite / WFH rest of the week)</option>
+        <option value="Hybrid">Hybrid</option>
+        <option value="Contract">Contract</option>
+        <option value="Remote">Remote</option>
+      </select>
     </div>
   </div>
+
   <div class="row">
     <label for="salary-min">Salary Range</label>
     <div style="display: flex; gap: 10px; align-items: center;">
@@ -66,11 +66,30 @@
       </select>
     </div>
   </div>
+
   <div class="row">
     <label for="description">Description</label>
     <textarea rows="5" class="form-control" name="job-description" [(ngModel)]="description"></textarea>
-   </div>
-  <div class="row">
+  </div>
+
+  <!-- Application Questions Section -->
+  <div class="row mt-3">
+    <label>Application Questions</label>
+    <div *ngFor="let q of applicationQuestions; let i = index" class="mb-2">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter question"
+        [(ngModel)]="q.question"
+      />
+      <button type="button" class="btn btn-danger btn-sm mt-1" (click)="removeQuestion(i)">
+        Remove
+      </button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="addQuestion()">Add Question</button>
+  </div>
+
+  <div class="row mt-3">
     <button (click)="openConfirmModal()">Post Job</button>
   </div>
 </div>
@@ -103,6 +122,14 @@
         <div class="detail-row">
           <span class="label">Description:</span>
           <span class="value description-text">{{ description }}</span>
+        </div>
+
+        <!-- Display Questions in Modal -->
+        <div class="detail-row" *ngIf="applicationQuestions.length > 0">
+          <span class="label">Questions:</span>
+          <ul>
+            <li *ngFor="let q of applicationQuestions">{{ q.question }}</li>
+          </ul>
         </div>
       </div>
       <div class="modal-footer">

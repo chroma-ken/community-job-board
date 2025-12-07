@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { JobsService } from '../services/jobs-service';
-import { Job } from '../models/job.model';
+import { Job, ApplicationResponse } from '../models/job.model';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,38 +18,32 @@ export class JobList implements OnInit {
   authService = inject(AuthService);
 
   jobs: Job[] = [];
-  jobTitleSearch = "";
-  jobLocationSearch = "";
-  jobTypeSearch = "";
+  jobTitleSearch = '';
+  jobLocationSearch = '';
+  jobTypeSearch = '';
 
   jobDetails: Job | null = null;
   showApplicationModal = false;
   isSubmitting = false;
   showConfirmation = false;
-  applicationResponses: { question: string; answer: string }[] = [];
+  applicationResponses: ApplicationResponse[] = [];
 
   showAlertModal = false;
   alertMessage = '';
 
-  applicationQuestions = [
-    { question: 'Why are you interested in this position?', required: true },
-    { question: 'What relevant experience do you have?', required: true },
-    { question: 'When are you available to start?', required: true }
-  ];
-
   jobTypes = [
-    { value: "", label: "All Job Types" },
-    { value: "Full-Time", label: "Full-Time" },
-    { value: "Part-Time", label: "Part-Time" },
-    { value: "Contract", label: "Contract" },
-    { value: "Remote", label: "Remote" }
+    { value: '', label: 'All Job Types' },
+    { value: 'Full-Time', label: 'Full-Time' },
+    { value: 'Part-Time', label: 'Part-Time' },
+    { value: 'Contract', label: 'Contract' },
+    { value: 'Remote', label: 'Remote' },
   ];
 
   filters = {
-    title: "",
-    company: "",
-    location: "",
-    type: ""
+    title: '',
+    company: '',
+    location: '',
+    type: '',
   };
 
   async ngOnInit() {
@@ -60,23 +54,18 @@ export class JobList implements OnInit {
   searchJob() {
     this.filters = {
       title: this.jobTitleSearch,
-      company: "",
+      company: '',
       location: this.jobLocationSearch,
-      type: this.jobTypeSearch
+      type: this.jobTypeSearch,
     };
     this.jobs = this.jobService.list(this.filters);
   }
 
   resetFilters() {
-    this.jobTitleSearch = "";
-    this.jobLocationSearch = "";
-    this.jobTypeSearch = "";
-    this.filters = {
-      title: "",
-      company: "",
-      location: "",
-      type: ""
-    };
+    this.jobTitleSearch = '';
+    this.jobLocationSearch = '';
+    this.jobTypeSearch = '';
+    this.filters = { title: '', company: '', location: '', type: '' };
     this.jobs = this.jobService.list();
   }
 
@@ -92,9 +81,7 @@ export class JobList implements OnInit {
 
   async toggleSaveJob(jobId: string | undefined, event: Event) {
     event.stopPropagation();
-    if (!jobId || !this.authService.isLoggedIn()) {
-      return;
-    }
+    if (!jobId || !this.authService.isLoggedIn()) return;
     await this.jobService.toggleSaveJob(jobId);
   }
 
@@ -111,9 +98,13 @@ export class JobList implements OnInit {
       return;
     }
 
-    this.applicationResponses = this.applicationQuestions.map(q => ({
+    // Pull dynamic questions from the selected job
+    const job = this.jobService.getById(jobId);
+    if (!job) return;
+
+    this.applicationResponses = (job.applicationQuestions || []).map(q => ({
       question: q.question,
-      answer: ''
+      answer: '',
     }));
 
     this.showApplicationModal = true;
@@ -137,11 +128,7 @@ export class JobList implements OnInit {
   }
 
   async submitApplication() {
-    const requiredQuestions = this.applicationQuestions.filter(q => q.required);
-    const allRequiredAnswered = requiredQuestions.every((q, index) => {
-      const response = this.applicationResponses.find(r => r.question === q.question);
-      return response && response.answer.trim().length > 0;
-    });
+    const allRequiredAnswered = this.applicationResponses.every(r => r.answer.trim().length > 0);
 
     if (!allRequiredAnswered) {
       this.showAlert('Please answer all required questions.');
