@@ -1,8 +1,9 @@
-<h1 class="fw-bold my-3 text-center">Find Jobs</h1>
+<h1 class="fw-bold my-2 text-center">Find Jobs</h1>
+
 <div class="container-fluid mb-4">
   <div class="row justify-content-center">
     <div class="col-lg-10">
-      <div class="row g-2 align-items-center search-bar-wrapper">
+      <div class="row g-2 search-bar-wrapper">
         <div class="col-md-4">
           <div class="input-icon-container">
             <i class="fas fa-search input-icon"></i>
@@ -37,65 +38,76 @@
 
 <div class="container-fluid">
   <div class="row mx-5 my-4">
+
+    @if (loading) {
+      <div class="loading-container text-center py-5 w-100">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Finding the best jobs for you...</p>
+      </div>
+    } @else {
     <div class="col-4">
-      <div class="job-list">
-        @for (job of jobs; track job.id) {
-          <div class="job-item" [class.active]="jobDetails?.id === job.id" (click)="viewJob(job.id)">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <h2 class="fs-5 mb-1">{{ job.title }}</h2>
-                <p class="text-muted mb-1">{{ job.location }} | {{ job.type }}</p>
-                <p class="text-success fw-bold mb-0">{{ job.salary }}</p>
+        <div class="job-list">
+          @for (job of jobs; track job.id) {
+            <div class="job-item" [class.active]="jobDetails?.id === job.id" (click)="viewJob(job.id)">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h2 class="fs-5 mb-1">{{ job.title }}</h2>
+                  <p class="text-muted mb-1">{{ job.location }} | {{ job.type }}</p>
+                  <p class="text-success fw-bold mb-0">{{ job.salary }}</p>
+                </div>
+                @if (canSaveJobs()) {
+                  <button
+                    class="btn btn-sm save-btn"
+                    [class.saved]="isJobSaved(job.id)"
+                    (click)="toggleSaveJob(job.id, $event)"
+                    [title]="isJobSaved(job.id) ? 'Remove from saved' : 'Save job'"
+                  >
+                    {{ isJobSaved(job.id) ? '★' : '☆' }}
+                  </button>
+                }
               </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="col">
+        @if (jobDetails) {
+          <div class="job-details-card">
+            <h2 class="fs-2 fw-bold">{{ jobDetails.title }}</h2>
+            <h3 class="fs-5 text-muted">{{ jobDetails.company }}</h3>
+            <div class="job-meta my-3">
+              <span class="badge badge-meta me-2">{{ jobDetails.location }}</span>
+              <span class="badge badge-meta me-2">{{ jobDetails.type }}</span>
+              <span class="badge bg-success">{{ jobDetails.salary }}</span>
+            </div>
+            <p class="mt-4">{{ jobDetails.description }}</p>
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-primary" (click)="applyToJob(jobDetails.id, $event)">Apply</button>
               @if (canSaveJobs()) {
-                <button 
-                  class="btn btn-sm save-btn"
-                  [class.saved]="isJobSaved(job.id)"
-                  (click)="toggleSaveJob(job.id, $event)"
-                  [title]="isJobSaved(job.id) ? 'Remove from saved' : 'Save job'"
+                <button
+                  class="btn"
+                  [class.btn-outline-warning]="isJobSaved(jobDetails.id)"
+                  [class.btn-outline-secondary]="!isJobSaved(jobDetails.id)"
+                  (click)="toggleSaveJob(jobDetails.id, $event)"
                 >
-                  {{ isJobSaved(job.id) ? '★' : '☆' }}
+                  {{ isJobSaved(jobDetails.id) ? 'Unsave Job' : 'Save Job' }}
                 </button>
               }
             </div>
           </div>
+        } @else {
+          <div class="empty-details text-center py-5">
+            <i class="fas fa-search empty-details-icon"></i>
+            <p class="text-muted">Select a job to view details</p>
+          </div>
         }
       </div>
-    </div>
 
-    <div class="col">
-      @if (jobDetails) {
-        <div class="job-details-card">
-          <h2 class="fs-2 fw-bold">{{ jobDetails.title }}</h2>
-          <h3 class="fs-5 text-muted">{{ jobDetails.company }}</h3>
-          <div class="job-meta my-3">
-            <span class="badge badge-meta me-2">{{ jobDetails.location }}</span>
-            <span class="badge badge-meta me-2">{{ jobDetails.type }}</span>
-            <span class="badge bg-success">{{ jobDetails.salary }}</span>
-          </div>
-         <div class="mt-4 description-text" [innerHTML]="formatDescription(jobDetails.description)"></div>
+    }
 
-          <div class="d-flex gap-2 mt-4">
-            <button class="btn btn-primary" (click)="applyToJob(jobDetails.id, $event)">Apply</button>
-            @if (canSaveJobs()) {
-              <button 
-                class="btn"
-                [class.btn-outline-warning]="isJobSaved(jobDetails.id)"
-                [class.btn-outline-secondary]="!isJobSaved(jobDetails.id)"
-                (click)="toggleSaveJob(jobDetails.id, $event)"
-              >
-                {{ isJobSaved(jobDetails.id) ? 'Unsave Job' : 'Save Job' }}
-              </button>
-            }
-          </div>
-        </div>
-      } @else {
-        <div class="empty-details text-center py-5">
-          <i class="fas fa-search empty-details-icon"></i>
-          <p class="text-muted">Select a job to view details</p>
-        </div>
-      }
-    </div>
   </div>
 </div>
 

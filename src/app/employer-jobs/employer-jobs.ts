@@ -161,7 +161,7 @@ export class EmployerJobs implements OnInit {
 
   async saveEdit() {
     if (!this.editingJob || !this.editingJob.id) return;
-    
+
     if (!this.editingJob.title || !this.editingJob.location || !this.editingJob.type || !this.editingJob.description || !this.editSalaryMin || !this.editSalaryMax) {
       this.showAlert('Please fill in all fields');
       return;
@@ -204,7 +204,7 @@ export class EmployerJobs implements OnInit {
 
   async confirmDelete() {
     if (!this.jobToDelete) return;
-    
+
     this.isDeleting = true;
     try {
       await this.jobService.delete(this.jobToDelete);
@@ -223,7 +223,7 @@ export class EmployerJobs implements OnInit {
 
   async acceptApplicant(applicant: Applicant) {
     if (!this.selectedJob?.id || !applicant.userId) return;
-    
+
     const success = await this.jobService.updateApplicantStatus(
       this.selectedJob.id,
       applicant.userId,
@@ -282,35 +282,4 @@ export class EmployerJobs implements OnInit {
         return 'bg-secondary';
     }
   }
-
-  
-formatDescription(text: string): string {
-  if (!text) return '';
-
-  const lines = text.split('\n');
-
-  let html = '';
-  let inList = false;
-
-  for (let line of lines) {
-    line = line.trim();
-    if (line.startsWith('-') || line.startsWith('*')) {
-      const content = line.slice(1).trim();
-      if (!inList) {
-        html += '<ul>';
-        inList = true;
-      }
-      html += `<li>${content}</li>`;
-    } else {
-      if (inList) {
-        html += '</ul>';
-        inList = false;
-      }
-      if (line) html += `<p>${line}</p>`;
-    }
-  }
-
-  if (inList) html += '</ul>';
-  return html;
-}
 }

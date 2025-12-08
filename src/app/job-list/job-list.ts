@@ -22,6 +22,8 @@ export class JobList implements OnInit {
   jobs: Job[] = [];
   jobDetails: Job | null = null;
 
+  loading = false;
+
   jobTitleSearch = '';
   jobLocationSearch = '';
   jobTypeSearch = '';
@@ -47,19 +49,27 @@ export class JobList implements OnInit {
     { value: 'Full-Time', label: 'Full-Time' },
     { value: 'Part-Time', label: 'Part-Time' },
     { value: 'Hybrid', label: 'Hybrid' },
-    { value: 'Hybrid(1 day onsite / WFH rest of the week)', label: 'Hybrid' },
-    { value: 'Hybrid(2 days onsite / WFH rest of the week)', label: 'Hybrid' },
-    { value: 'Hybrid(3 days onsite / WFH rest of the week)', label: 'Hybrid' },
+   { value: 'Hybrid(1 day onsite / WFH rest of the week)', label: 'Hybrid (1 Day Onsite)' },
+    { value: 'Hybrid(2 days onsite / WFH rest of the week)', label: 'Hybrid (2 Days Onsite)' },
+    { value: 'Hybrid(3 days onsite / WFH rest of the week)', label: 'Hybrid (3 Days Onsite)' },
     { value: 'Full-Time(Remote)', label: 'Full-Time-Remote' },
     { value: 'Part-Time(Remote)', label: 'Part-Time-Remote' },
     { value: 'Contract', label: 'Contract' },
     { value: 'Remote', label: 'Remote' },
   ];
 
-  async ngOnInit() {
-    // Load jobs first
-    await this.jobService.loadJobs();
-    this.jobs = this.jobService.list();
+async ngOnInit() {
+    // CHANGE: Set loading to true before fetching data
+    this.loading = true;
+
+    try {
+      // Load jobs first
+      await this.jobService.loadJobs();
+      this.jobs = this.jobService.list();
+    } finally {
+      // CHANGE: Set loading to false after data is loaded (or if it fails)
+      this.loading = false;
+    }
 
     // Check if login/signup redirected user back to apply automatically
     const returnJobId = this.route.snapshot.queryParamMap.get('applyJobId');

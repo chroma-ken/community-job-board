@@ -49,14 +49,13 @@
             <span class="badge badge-meta me-2">{{ selectedJob.type }}</span>
             <span class="badge bg-success">{{ selectedJob.salary }}</span>
           </div>
-          <div class="mt-4 description-text" [innerHTML]="formatDescription(selectedJob.description)"></div>
-
+          <p class="mt-4">{{ selectedJob.description }}</p>
           @if (selectedJob.postedDate) {
             <p class="text-muted small mt-4">
               Posted: {{ selectedJob.postedDate | date: 'short' }}
             </p>
           }
-          
+
           <div class="applicants-section mt-5">
             <h4 class="fw-bold mb-3">Applicants ({{ selectedJob.applicants?.length || 0 }})</h4>
             @if (selectedJob.applicants && selectedJob.applicants.length > 0) {
@@ -84,14 +83,14 @@
                         }
                       </div>
                       <div class="d-flex gap-2">
-                        <button 
+                        <button
                           class="btn btn-sm btn-outline-primary"
                           title="View applicant details"
                           (click)="openApplicantModal(applicant)"
                         >
                           <i class="fas fa-eye"></i>
                         </button>
-                        <button 
+                        <button
                           class="btn btn-sm btn-outline-success"
                           title="Accept applicant"
                           (click)="acceptApplicant(applicant)"
@@ -99,7 +98,7 @@
                         >
                           <i class="fas fa-check"></i>
                         </button>
-                        <button 
+                        <button
                           class="btn btn-sm btn-outline-danger"
                           title="Reject applicant"
                           (click)="openRejectConfirm(applicant)"
@@ -216,14 +215,14 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button 
+        <button
           class="btn btn-success"
           (click)="acceptApplicant(selectedApplicant)"
           [disabled]="selectedApplicant.status === 'accepted'"
         >
           <i class="fas fa-check me-1"></i> Accept
         </button>
-        <button 
+        <button
           class="btn btn-danger"
           (click)="openRejectConfirm(selectedApplicant)"
           [disabled]="selectedApplicant.status === 'rejected'"
@@ -240,7 +239,7 @@
   <div class="modal-overlay">
     <div class="modal-content modal-lg">
       <h2>Edit Job</h2>
-      
+
       <div class="form-group mb-3">
         <label for="edit-title">Job Title</label>
         <div class="input-icon-container">
