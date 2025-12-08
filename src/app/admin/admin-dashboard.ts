@@ -72,11 +72,13 @@ export class AdminDashboard implements OnInit {
   }
 
   loadJobs() {
-    this.loading.set(true);
-    this.allJobs.set(this.jobsService.list());
-    this.currentPage.set(1); // Reset to first page
-    this.loading.set(false);
-  }
+  this.loading.set(true);
+  // Only show jobs that are pending or rejected
+  this.allJobs.set(this.jobsService.list().filter(job => job.status !== 'approved'));
+  this.currentPage.set(1); // Reset to first page
+  this.loading.set(false);
+}
+
 
   resetFilters() {
     this.searchTitle.set('');

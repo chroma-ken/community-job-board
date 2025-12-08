@@ -109,13 +109,6 @@
                   >
                     View
                   </button>
-                  <button 
-                    class="btn btn-sm btn-outline-danger" 
-                    title="Permanently Delete Job"
-                    (click)="openDeleteConfirm(job)"
-                  >
-                    Delete
-                  </button>
                 </td>
               </tr>
             }
@@ -213,9 +206,6 @@
         </button>
         <button class="btn btn-warning" (click)="openRejectConfirm(selectedJob()!)">
           Reject
-        </button>
-        <button class="btn btn-danger" (click)="openDeleteConfirm(selectedJob()!)">
-          Delete
         </button>
       </div>
     </div>
