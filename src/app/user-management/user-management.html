@@ -212,6 +212,30 @@
             <p>{{ selectedUser()!.savedJobs!.length }} jobs saved</p>
           </div>
         }
+        
+        @if (selectedUser()?.role === 'applicant') {
+          <div class="mb-3">
+            <label class="fw-bold">Applied Jobs:</label>
+            @if (loadingAppliedJobs()) {
+              <p class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</p>
+            } @else if (selectedUserAppliedJobs().length === 0) {
+              <p class="text-muted">No job applications</p>
+            } @else {
+              <ul class="list-group mt-2">
+                @for (job of selectedUserAppliedJobs(); track job.id) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>{{ job.title }}</strong>
+                      <br>
+                      <small class="text-muted">{{ job.company }} - {{ job.location }}</small>
+                    </div>
+                    <span class="badge bg-info">{{ job.type }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
       </div>
       <div class="modal-footer">
         <button class="btn btn-danger" (click)="openDeleteConfirm(selectedUser()!.uid)">

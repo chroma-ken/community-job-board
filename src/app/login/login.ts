@@ -113,12 +113,20 @@ export class Login implements OnInit, OnDestroy {
       this.resetForm();
 
       if (this.returnJobId) {
-        // 🔥 FIX: redirect to job-list with job ID
+        // Redirect to job-list with job ID for applicants returning to apply
         this.router.navigate(['/job-list'], {
           queryParams: { applyJobId: this.returnJobId }
         });
       } else {
-        this.router.navigate(['/job-list']);
+        // Redirect based on user role
+        const userRole = this.authService.userProfile()?.role;
+        if (userRole === 'admin') {
+          this.router.navigate(['/admin']);
+        } else if (userRole === 'employer') {
+          this.router.navigate(['/employer-jobs']);
+        } else {
+          this.router.navigate(['/job-list']);
+        }
       }
     }
   }

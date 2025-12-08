@@ -109,6 +109,18 @@
                   >
                     View
                   </button>
+                  <button 
+                    class="btn btn-sm btn-success me-1" 
+                    (click)="approveJob(job)"
+                  >
+                    Approve
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-warning" 
+                    (click)="openRejectConfirm(job)"
+                  >
+                    Reject
+                  </button>
                 </td>
               </tr>
             }

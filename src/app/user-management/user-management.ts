@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Firestore, collection, getDocs, deleteDoc, doc, getDoc } from '@angular/fire/firestore';
 import { UserProfile } from '../models/user.model';
+import { JobsService } from '../services/jobs-service';
+import { Job } from '../models/job.model';
 
 @Component({
   selector: 'app-user-management',
@@ -13,10 +15,13 @@ import { UserProfile } from '../models/user.model';
 })
 export class UserManagement implements OnInit {
   private firestore = inject(Firestore);
+  private jobsService = inject(JobsService);
 
   allUsers = signal<UserProfile[]>([]);
   selectedUser = signal<UserProfile | null>(null);
+  selectedUserAppliedJobs = signal<Job[]>([]);
   loading = signal(false);
+  loadingAppliedJobs = signal(false);
   actionMessage = signal<{type: 'success' | 'error', text: string} | null>(null);
 
   searchEmail = signal<string>('');
@@ -89,13 +94,27 @@ export class UserManagement implements OnInit {
     this.currentPage.set(1);
   }
 
-  selectUser(user: UserProfile) {
+  async selectUser(user: UserProfile) {
     this.selectedUser.set(user);
+    this.selectedUserAppliedJobs.set([]);
     this.actionMessage.set(null);
+    
+    if (user.role === 'applicant') {
+      this.loadingAppliedJobs.set(true);
+      try {
+        const appliedJobs = await this.jobsService.getJobsAppliedByUser(user.uid);
+        this.selectedUserAppliedJobs.set(appliedJobs);
+      } catch (error) {
+        console.error('Error loading applied jobs:', error);
+      } finally {
+        this.loadingAppliedJobs.set(false);
+      }
+    }
   }
 
   closeModal() {
     this.selectedUser.set(null);
+    this.selectedUserAppliedJobs.set([]);
     this.actionMessage.set(null);
   }
 
@@ -113,9 +132,10 @@ export class UserManagement implements OnInit {
     if (!this.userToDelete) return;
 
     try {
+      await this.jobsService.removeUserFromAllApplications(this.userToDelete);
       await deleteDoc(doc(this.firestore, 'users', this.userToDelete));
       await this.loadUsers();
-      this.showMessage('success', 'User has been deleted');
+      this.showMessage('success', 'User and all their data have been deleted. Note: The user will be removed from Firebase Authentication on their next login attempt.');
       this.closeDeleteConfirm();
       this.closeModal();
     } catch (error) {
