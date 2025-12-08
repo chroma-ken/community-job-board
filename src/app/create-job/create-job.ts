@@ -198,7 +198,6 @@ ngOnInit() {
 formatDescription(text: string): string {
   if (!text) return '';
 
-  // Split text into lines
   const lines = text.split('\n');
 
   let html = '';
