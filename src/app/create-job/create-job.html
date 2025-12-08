@@ -72,18 +72,19 @@
     </div>
   </div>
 
-  <!-- Description -->
-<div class="row mb-3">
+  <div class="row mb-3">
   <label for="description">Description</label>
   <textarea
     rows="5"
     class="form-control"
     name="job-description"
     [(ngModel)]="description"
-    (input)="formatBullets()"
+    (input)="formatBulletsLive()"
     placeholder="Type - or * for bullets, press Enter for new line">
   </textarea>
 </div>
+
+  
 
 
   <!-- Application Questions -->
@@ -162,8 +163,9 @@
         </div>
         <div class="detail-row">
           <span class="label">Description:</span>
-          <span class="value description-text">{{ description }}</span>
+          <span class="value description-text" [innerHTML]="formatDescription(description)"></span>
         </div>
+
 
         <!-- Display Questions in Modal -->
         <div class="detail-row" *ngIf="applicationQuestions.length > 0">

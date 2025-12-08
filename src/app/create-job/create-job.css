@@ -168,10 +168,15 @@
     word-break: break-word;
    }
 
-   .detail-row .description-text {
+  .detail-row .description-text {
     white-space: pre-wrap;
     line-height: 1.5;
-   }
+    word-wrap: break-word;
+    display: block;
+    list-style: disc;
+    padding-left: 1.2em;
+}
+
 
    .modal-footer {
     padding: 16px 24px;
@@ -291,6 +296,48 @@
   transform: rotate(180deg);
 }
 
+
+.textarea-wrapper {
+  position: relative;
+}
+
+.textarea-wrapper textarea {
+  position: relative;
+  z-index: 2;
+  caret-color: black;       /* keep cursor visible */
+}
+
+.textarea-mirror {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;    /* preserves line breaks */
+  word-wrap: break-word;    /* wrap long lines */
+  pointer-events: none;     /* allow typing through textarea */
+  color: #000;
+}
+
+/* Optional: style bullets in mirror */
+.textarea-mirror::before {
+  content: "";
+}
+
+.description-text ul {
+  padding-left: 1.2em;
+  margin: 0.5em 0;
+}
+
+.description-text li {
+  margin-bottom: 0.3em;
+}
 
 
 

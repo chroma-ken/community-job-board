@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { JobsService } from '../services/jobs-service';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { EMPLOYER_SEED_DATA } from '../seeds/employer-seed';
 
 @Component({
   selector: 'app-create-job',
@@ -60,15 +59,14 @@ export class CreateJob implements OnInit {
   newDropdownQuestion = '';
   showDropdown = false;
 
-  ngOnInit() {
-    const profile = this.authService.userProfile();
-    if (profile?.role === 'admin') this.company = 'JobBoard';
-    else if (profile?.company) this.company = profile.company;
-    else if (profile?.email) {
-      const employer = EMPLOYER_SEED_DATA.find(emp => emp.email === profile.email);
-      if (employer) this.company = employer.company;
-    }
-  }
+  
+ngOnInit() {
+  const profile = this.authService.userProfile();
+  if (profile?.role === 'admin') this.company = 'JobBoard';
+  else if (profile?.company) this.company = profile.company;
+  // no more EMPLOYER_SEED_DATA
+}
+
 
   isAdmin(): boolean {
     return this.authService.userProfile()?.role === 'admin';
@@ -179,21 +177,77 @@ export class CreateJob implements OnInit {
     }
   }
 
-  formatBullets() {
-    // Split textarea content by lines
-    const lines = this.description.split('\n');
+ formatBullets() {
+  const mirror = document.querySelector('.textarea-mirror');
+  if (!mirror) return;
 
-    // Transform lines starting with "-" or "*" into bullets
-    const formattedLines = lines.map(line => {
+  // Add line breaks and bullets
+  mirror.innerHTML = this.description
+    .split('\n')
+    .map(line => {
       line = line.trim();
-      if (line.startsWith('- ') || line.startsWith('* ')) {
-        return '• ' + line.substring(2).trim();
+      if (line.startsWith('*') || line.startsWith('-')) {
+        return `• ${line.slice(1).trim()}`;
+      } else {
+        return line;
       }
-      return line;
-    });
+    })
+    .join('<br>');
+}
 
-    // Join back and update description without moving cursor
-    this.description = formattedLines.join('\n');
+formatDescription(text: string): string {
+  if (!text) return '';
+
+  // Split text into lines
+  const lines = text.split('\n');
+
+  let html = '';
+  let inList = false;
+
+  for (let line of lines) {
+    line = line.trim();
+    if (line.startsWith('-') || line.startsWith('*')) {
+      const content = line.slice(1).trim();
+      if (!inList) {
+        html += '<ul>';
+        inList = true;
+      }
+      html += `<li>${content}</li>`;
+    } else {
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      if (line) html += `<p>${line}</p>`;
+    }
   }
+
+  if (inList) html += '</ul>';
+  return html;
+}
+
+
+
+formatBulletsLive() {
+  // Split text into lines
+  const lines = this.description.split('\n');
+
+  // Transform lines starting with '-' or '*' into bullets
+  const formattedLines = lines.map(line => {
+    line = line.trim();
+    if (line.startsWith('- ') || line.startsWith('* ')) {
+      return `• ${line.slice(2)}`;
+    }
+    return line;
+  });
+
+  // Rejoin lines
+  this.description = formattedLines.join('\n');
+}
+
+
+
+
+
 }
 ``
