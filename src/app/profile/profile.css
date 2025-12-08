@@ -1,0 +1,77 @@
+.container {
+  max-width: 1100px;
+  font-family: 'Poppins', sans-serif; 
+}
+
+.card {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  border: 1px solid #e4e4e7;
+  background: white;
+}
+
+h2, h4 {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+input.form-control,
+textarea.form-control {
+  border-radius: 8px;
+  border-color: #cbd5e1;
+  font-family: 'Poppins', sans-serif;
+}
+
+input.form-control:focus,
+textarea.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+button.btn-primary {
+  border-radius: 999px; 
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+button.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+button.btn-outline-primary {
+  border-radius: 999px;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+button.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* --- RESPONSIVE PROFILE --- */
+@media (max-width: 991px) {
+  /* Stack the columns */
+  .row.g-4 {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .col-lg-7, .col-lg-5 {
+    width: 100%;
+  }
+
+  .card {
+    padding: 20px !important; /* Reduce padding on mobile cards */
+  }
+
+  /* Stack inputs in "First Name / Last Name" row */
+  .row .col-md-6 {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}

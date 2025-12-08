@@ -1,0 +1,57 @@
+================================================================================
+COMMUNITY JOB BOARD - TEST ACCOUNTS
+================================================================================
+
+ADMIN ACCOUNT
+Password: Admin123!
+================================================================================
+Email: admin@example.com
+Note: Admin can view, approve, reject, and delete job listings
+
+EMPLOYER ACCOUNTS
+Password: Employer123!
+================================================================================
+1. TechCorp: techcorp@example.com
+2. DevSolutions: devsolutions@example.com
+3. Designify: designify@example.com
+4. SysCare: syscare@example.com
+5. BuildRight: buildright@example.com
+6. InsightWorks: insightworks@example.com
+7. QualityPlus: qualityplus@example.com
+8. AppWave: appwave@example.com
+9. NetSecure: netsecure@example.com
+10. CopyCraft: copycraft@example.com
+
+APPLICANT ACCOUNTS
+Password: Applicant123!
+================================================================================
+1. John Smith: john.smith@example.com
+2. Maria Garcia: maria.garcia@example.com
+3. David Chen: david.chen@example.com
+4. Sarah Johnson: sarah.johnson@example.com
+5. Michael Brown: michael.brown@example.com
+6. Emma Wilson: emma.wilson@example.com
+7. James Lee: james.lee@example.com
+8. Sophia Martinez: sophia.martinez@example.com
+9. Robert Taylor: robert.taylor@example.com
+10. Olivia Anderson: olivia.anderson@example.com
+
+================================================================================
+ACCOUNT FEATURES
+================================================================================
+
+EMPLOYER FEATURES:
+- Post and manage job listings
+- Edit job details (title, location, type, salary, description)
+- Delete job postings
+- View applicants for each job
+- Jobs start in "pending" status until admin approval
+
+APPLICANT FEATURES:
+- Browse all available jobs
+- Apply to job listings
+- Save jobs for later
+- View saved jobs on dedicated page
+- Filter jobs by search criteria
+
+================================================================================

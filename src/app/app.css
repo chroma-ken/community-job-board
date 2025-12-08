@@ -1,0 +1,132 @@
+nav.navbar {
+    height: var(--navbar-height);
+    background-color: var(--primary-color) !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Logo */
+.navbar-logo {
+    text-decoration: none;
+}
+
+/* Added style for the logo image */
+.navbar-logo img {
+    border-radius: 8px; /* Optional: adds rounded corners to the logo */
+}
+
+.navbar-logo h1 { 
+    font-size: 1.75rem; /* 28px */
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.nav-link { 
+    color: rgb(221, 221, 221) !important; 
+    font-size: 0.95rem; 
+    font-weight: 500;
+    padding: 8px 16px !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 20px;
+    margin-left: 20px;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    height: 40px;
+}
+
+.navbar-user-info span {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.login-btn {
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    font-weight: 600;
+    padding: 8px 24px;
+    background: transparent;
+}
+.login-btn:hover {
+    background: white;
+    color: var(--primary-color);
+    border-color: white;
+}
+
+/* --- RESPONSIVE NAVBAR --- */
+@media (max-width: 991px) {
+    nav.navbar {
+        height: auto; /* Allow navbar to grow based on content */
+        padding: 1rem;
+        min-height: var(--navbar-height);
+    }
+    
+    /* 1. Stack the Logo and the Content Group */
+    nav.navbar > div {
+        flex-direction: column;
+        align-items: flex-start; /* Align to left */
+        gap: 1.5rem;
+    }
+
+    /* 2. Target the link container (Find Jobs, Saved Jobs, etc.) */
+    .d-flex.gap-3.align-items-center {
+        flex-direction: column;
+        align-items: stretch !important; /* Make buttons full width */
+        width: 100%;
+        gap: 10px !important;
+    }
+
+    /* 3. Link Styling for Mobile */
+    .nav-link {
+        text-align: center;
+        width: 100%;
+        display: block;
+        padding: 12px !important;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* 4. User Info Section stacking */
+    .navbar-user-info {
+        border-left: none;
+        padding-left: 0;
+        margin-left: 0;
+        margin-top: 10px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        
+        /* Flex adjustments */
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        gap: 15px;
+    }
+
+    /* Make logout/profile buttons full width on mobile */
+    .navbar-user-info button, 
+    .navbar-user-info a {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .login-btn {
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+}

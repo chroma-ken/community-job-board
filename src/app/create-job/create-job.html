@@ -1,0 +1,183 @@
+<h1 class="fw-bold my-1">Post a Job</h1>
+<div class="container-fluid">
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  <!-- Job Title -->
+  <div class="row">
+    <label for="title">Job Title</label>
+    <div class="input-icon-container">
+      <i class="fas fa-briefcase input-icon"></i>
+      <input type="text" name="job-title" id="title" [(ngModel)]="title" class="form-control" placeholder="Enter job title">
+    </div>
+  </div>
+
+  <!-- Company -->
+  <div class="row">
+    <label for="company">Company</label>
+    <div class="input-icon-container">
+      <i class="fas fa-building input-icon"></i>
+      <input type="text" name="company" id="company" [(ngModel)]="company" [disabled]="isAdmin()" class="form-control" placeholder="Enter company name">
+    </div>
+  </div>
+
+  <!-- Location -->
+  <div class="row">
+    <label for="location">Location</label>
+    <div class="input-icon-container">
+      <i class="fas fa-location-dot input-icon"></i>
+      <input type="text" name="job-location" id="location" [(ngModel)]="location" class="form-control" placeholder="Enter city or region">
+    </div>
+  </div>
+
+  <!-- Job Type -->
+  <div class="row">
+    <label for="type">Type</label>
+    <div class="input-icon-container">
+      <i class="fas fa-tag input-icon"></i> 
+      <select name="job-type" id="type" [(ngModel)]="type" class="form-control">
+        <option value="">Select Job Type</option>
+        <option value="Part-Time">Part-Time (Onsite)</option>
+        <option value="Full-Time">Full-Time (Onsite)</option>
+        <option value="Full-Time(Remote)">Full-Time(Remote)</option>
+        <option value="Part-Time(Remote)">Part-Time(Remote)</option>
+        <option value="Hybrid (1 day onsite / WFH rest of the week)">Hybrid (1 day onsite / WFH rest of the week)</option>
+        <option value="Hybrid (2 days onsite / WFH rest of the week)">Hybrid (2 days onsite / WFH rest of the week)</option>
+        <option value="Hybrid (3 days onsite / WFH rest of the week)">Hybrid (3 days onsite / WFH rest of the week)</option>
+        <option value="Hybrid">Hybrid</option>
+        <option value="Contract">Contract</option>
+        <option value="Remote">Remote</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Salary Range -->
+  <div class="row">
+    <label for="salary-min">Salary Range</label>
+    <div class="d-flex gap-2 align-items-center">
+      <select name="salary-min" id="salary-min" [(ngModel)]="salaryMin" class="form-control">
+        <option value="">Min Salary</option>
+        @for (option of salaryOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      <span>-</span>
+      <select name="salary-max" id="salary-max" [(ngModel)]="salaryMax" class="form-control">
+        <option value="">Max Salary</option>
+        @for (option of salaryOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+  <label for="description">Description</label>
+  <textarea
+    rows="5"
+    class="form-control"
+    name="job-description"
+    [(ngModel)]="description"
+    (input)="formatBulletsLive()"
+    placeholder="Type - or * for bullets, press Enter for new line">
+  </textarea>
+</div>
+
+  
+
+
+<div class="row mt-3">
+    <label class="section-label">Interview Questions</label>
+
+    <div class="dropdown-container w-100 position-relative">
+      <button type="button" class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" (click)="toggleDropdown()">
+        <span>Select Questions</span>
+        <i class="fas" [ngClass]="{'fa-chevron-down': !showDropdown, 'fa-chevron-up': showDropdown}"></i>
+      </button>
+
+      <div class="dropdown-menu p-3 w-100" [class.show]="showDropdown">
+        <div *ngFor="let q of dropdownQuestions; let i = index" class="d-flex align-items-center mb-2">
+          <div class="form-check flex-grow-1">
+            <input type="checkbox" class="form-check-input me-2" [(ngModel)]="q.selected" id="q{{i}}">
+            <label class="form-check-label" for="q{{i}}">{{ q.text }}</label>
+          </div>
+          <button *ngIf="q.isCustom" type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="deleteDropdownQuestion(i)">&times;</button>
+        </div>
+
+        <div class="d-flex mt-3 gap-2 add-question-row">
+          <input 
+            type="text" 
+            class="form-control flex-grow-1" 
+            placeholder="Add your own question..." 
+            [(ngModel)]="newDropdownQuestion" 
+            (keydown.enter)="addCustomDropdownQuestion()"
+          >
+          <button type="button" class="btn btn-primary" (click)="addCustomDropdownQuestion()">Add</button>
+          <button type="button" class="btn btn-success" (click)="addSelectedQuestionsToForm()">Enter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="selected-questions mt-3">
+      <div *ngFor="let q of applicationQuestions; let i = index" class="card d-flex flex-row justify-content-between align-items-center p-2 mb-2 shadow-sm">
+        <span class="m-0 ps-2 text-break">{{ q.question }}</span>
+        <button type="button" class="btn btn-sm btn-outline-danger ms-3 flex-shrink-0" (click)="removeQuestion(i)">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Job Button -->
+  <div class="row mt-3">
+    <button class="btn btn-primary" (click)="openConfirmModal()">Post Job</button>
+  </div>
+</div>
+
+@if (showConfirmModal) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Job Posting</h2>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">Job Title:</span>
+          <span class="value">{{ title }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Company:</span>
+          <span class="value">{{ company }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Location:</span>
+          <span class="value">{{ location }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Type:</span>
+          <span class="value">{{ type }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Salary:</span>
+          <span class="value">{{ salary }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Description:</span>
+          <span class="value description-text" [innerHTML]="formatDescription(description)"></span>
+        </div>
+
+
+        <!-- Display Questions in Modal -->
+        <div class="detail-row" *ngIf="applicationQuestions.length > 0">
+          <span class="label">Questions:</span>
+          <ul>
+            <li *ngFor="let q of applicationQuestions">{{ q.question }}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-confirm" (click)="confirmCreateJob()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Creating...' : 'Confirm' }}
+        </button>
+        <button class="btn-cancel" (click)="closeConfirmModal()" [disabled]="isSubmitting">Cancel</button>
+      </div>
+    </div>
+  </div>
+}

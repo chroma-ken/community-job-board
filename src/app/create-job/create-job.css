@@ -1,0 +1,270 @@
+.container-fluid {
+  max-width: 800px;
+  margin: 40px auto;
+  background: white;
+  padding: 60px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e4e4e7;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+.row {
+  margin-bottom: 24px;
+  display: block;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.input-icon-container {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 30px; 
+  transform: translateY(-50%);
+  color: #a1a1aa;
+  font-size: 1.2rem; 
+  z-index: 2;
+  pointer-events: none;
+}
+
+.input-icon-container .form-control,
+.input-icon-container select {
+  padding-left: 60px; 
+  height: 54px; 
+  border-radius: 8px;
+  border: 1px solid #e4e4e7;
+  font-family: 'Poppins', sans-serif;
+  appearance: none; /* Removes default arrow */
+  -webkit-appearance: none;
+}
+
+/* --- BUTTONS --- */
+
+/* Full width submit button style */
+.btn-block-submit {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.1rem;
+  margin-top: 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  transition: all 0.2s;
+  display: block;
+  cursor: pointer;
+}
+
+.btn-block-submit:hover {
+  background-color: #55555a;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Regular primary button helper */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #55555a;
+}
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease-out;
+}
+
+.modal-content h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.modal-body {
+  margin-bottom: 2rem;
+}
+
+.detail-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #f4f4f5;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: #71717a;
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.value {
+  color: #18181b;
+  flex-grow: 1;
+}
+
+.description-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+/* Modal Specific Buttons - Sizing Fixed */
+.btn-confirm {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  min-width: 120px;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.btn-confirm:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-cancel {
+  background-color: white;
+  color: var(--text-main);
+  border: 1px solid #e4e4e7;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  min-width: 120px;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.btn-cancel:hover {
+  background-color: #f4f4f5;
+  color: black;
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- RESPONSIVE FORM --- */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 30px 20px;
+    margin: 20px 10px;
+    width: auto;
+    max-width: 100%;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+  }
+
+  /* Adjust inputs for touch targets */
+  .input-icon-container .form-control,
+  .input-icon-container select {
+    height: 48px;
+    font-size: 16px; /* Prevents auto-zoom on iOS */
+  }
+
+  /* Stack salary inputs if they are flexed */
+  .d-flex.gap-2.align-items-center {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  /* Hide the dash between salary inputs when stacked */
+  .d-flex.gap-2.align-items-center span {
+    display: none;
+  }
+}
+
+.btn-sm {
+  padding: 4px 10px !important;
+  font-size: 1.2rem !important;
+  line-height: 1 !important;
+  height: 34px !important;
+  width: 34px !important;
+  min-width: auto !important; /* Prevents the 100px minimum width */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px;
+}
+
+/* --- FIX: Add Question Input & Button Alignment --- */
+.add-question-row {
+  align-items: stretch !important; /* Forces both to same height */
+  height: 48px; /* Fixed height for the row */
+}
+
+.add-question-row .form-control {
+  height: 100% !important;
+  margin-bottom: 0;
+}
+
+.add-question-row .btn {
+  height: 100% !important;
+  margin-top: 0 !important;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}

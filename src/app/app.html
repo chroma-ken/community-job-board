@@ -1,0 +1,44 @@
+<nav class="navbar container-fluid px-4">
+  <div class="d-flex justify-content-between align-items-center w-100">
+    <a class="text-decoration-none navbar-logo d-flex align-items-center gap-2" routerLink="/">
+      <img src="jobsearch.png" alt="JobBoard Logo" height="40">
+      <h1 class="mb-0">JobBoard</h1>
+    </a>
+    <div class="d-flex gap-3 align-items-center">
+      @if (authService.isApplicant() || !authService.isLoggedIn()) {
+        <a class="nav-link" routerLink="/job-list" routerLinkActive="active">Find Jobs</a>
+      }
+      
+      @if (authService.isLoggedIn()) {
+        @if (authService.isApplicant()) {
+          <a class="nav-link" routerLink="/saved-jobs" routerLinkActive="active">Saved Jobs</a>
+          <a class="nav-link" routerLink="/applied-jobs" routerLinkActive="active">Applied Jobs</a>
+        }
+        
+        @if (authService.isEmployer()) {
+          <a class="nav-link" routerLink="/create-job" routerLinkActive="active">Post Job</a>
+          <a class="nav-link" routerLink="/employer-jobs" routerLinkActive="active">My Jobs</a>
+        }
+        
+        @if (authService.isAdmin()) {
+          <a class="nav-link" routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Jobs Management</a>
+          <a class="nav-link" routerLink="/user-management" routerLinkActive="active">User Management</a>
+        }
+
+        <div class="navbar-user-info ms-2">
+          <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+            <i class="fas fa-user-circle me-1"></i>
+            Profile
+          </a>
+          <span class="badge bg-secondary">{{ authService.userProfile()?.role }}</span>
+          <button class="btn btn-sm login-btn" (click)="authService.logout()">Logout</button>
+        </div>
+      } @else {
+        <a class="btn btn-sm login-btn" routerLink="/login">Login</a>
+      }
+    </div>
+  </div>
+</nav>
+<main class="p-3">
+  <router-outlet/>
+</main>
