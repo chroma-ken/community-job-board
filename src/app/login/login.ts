@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { UserRole } from '../models/user.model';
 
@@ -14,10 +14,12 @@ import { UserRole } from '../models/user.model';
 })
 export class Login implements OnInit, OnDestroy {
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  firstName = signal('')
-  lastName = signal('')
-  companyName = signal('')
+  firstName = signal('');
+  lastName = signal('');
+  companyName = signal('');
   email = signal('');
   password = signal('');
   selectedRole = signal<UserRole>('applicant');
@@ -31,9 +33,15 @@ export class Login implements OnInit, OnDestroy {
   loading = this.authService.loading;
   authError = this.authService.authError;
 
+  // IMPORTANT: store redirect job
+  private returnJobId: string | null = null;
+
   ngOnInit() {
     this.authService.clearError();
     this.resetForm();
+
+    // Read ?applyJobId=123
+    this.returnJobId = this.route.snapshot.queryParamMap.get('applyJobId');
   }
 
   ngOnDestroy() {
@@ -41,7 +49,7 @@ export class Login implements OnInit, OnDestroy {
   }
 
   toggleMode() {
-    this.isRegisterMode.update(value => !value);
+    this.isRegisterMode.update(x => !x);
     this.authService.clearError();
   }
 
@@ -70,8 +78,6 @@ export class Login implements OnInit, OnDestroy {
     try {
       await this.authService.sendPasswordReset(email);
       this.showResetConfirmation.set(true);
-    } catch {
-      // error message already set in authService
     } finally {
       this.resetInProgress.set(false);
     }
@@ -90,12 +96,10 @@ export class Login implements OnInit, OnDestroy {
     }
 
     if (this.isRegisterMode()) {
-      // Terms and conditions must be accepted for all sign ups
       if (!this.acceptedTerms()) {
         this.authService.authError.set('You must agree to the Terms and Conditions to create an account.');
         return;
       }
-
     }
 
     let success: boolean;
@@ -107,6 +111,23 @@ export class Login implements OnInit, OnDestroy {
 
     if (success) {
       this.resetForm();
+
+      if (this.returnJobId) {
+        // Redirect to job-list with job ID for applicants returning to apply
+        this.router.navigate(['/job-list'], {
+          queryParams: { applyJobId: this.returnJobId }
+        });
+      } else {
+        // Redirect based on user role
+        const userRole = this.authService.userProfile()?.role;
+        if (userRole === 'admin') {
+          this.router.navigate(['/admin']);
+        } else if (userRole === 'employer') {
+          this.router.navigate(['/employer-jobs']);
+        } else {
+          this.router.navigate(['/job-list']);
+        }
+      }
     }
   }
 }

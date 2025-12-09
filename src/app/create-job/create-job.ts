@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { JobsService } from '../services/jobs-service';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { EMPLOYER_SEED_DATA } from '../seeds/employer-seed';
 
 @Component({
   selector: 'app-create-job',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,],
   templateUrl: './create-job.html',
   styleUrl: './create-job.css',
 })
@@ -17,15 +16,15 @@ export class CreateJob implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  title: string = '';
-  company: string = '';
-  location: string = '';
-  type: string = '';
-  description: string = '';
-  salaryMin: string = '';
-  salaryMax: string = '';
-  salary: string = '';
-  error: string = '';
+  title = '';
+  company = '';
+  location = '';
+  type = '';
+  description = '';
+  salaryMin = '';
+  salaryMax = '';
+  salary = '';
+  error = '';
   showConfirmModal = false;
   isSubmitting = false;
 
@@ -43,46 +42,86 @@ export class CreateJob implements OnInit {
     { value: 300000, label: '₱300,000+' },
   ];
 
-  ngOnInit() {
-    // Get company from user profile or derive from email
-    const profile = this.authService.userProfile();
+  // Selected questions for the job application
+  applicationQuestions: { question: string }[] = [];
 
-    // Admins use "jobboard" as company
-    if (profile?.role === 'admin') {
-      this.company = 'JobBoard';
-    } else if (profile?.company) {
-      this.company = profile.company;
-    } else if (profile?.email) {
-      // Derive company from email based on seed data
-      const employer = EMPLOYER_SEED_DATA.find((emp) => emp.email === profile.email);
-      if (employer) {
-        this.company = employer.company;
-      }
-    }
-    console.log('Company loaded:', this.company);
-  }
+  // Premade + custom questions inside dropdown
+  dropdownQuestions: { text: string; selected: boolean; isCustom?: boolean }[] = [
+    { text: 'Why do you want to work here?', selected: false },
+    { text: 'Describe your strengths and weaknesses.', selected: false },
+    { text: 'What are your salary expectations?', selected: false },
+    { text: 'Where do you see yourself in 5 years?', selected: false },
+    { text: 'What motivates you?', selected: false },
+  ];
+
+  
+
+  newDropdownQuestion = '';
+  showDropdown = false;
+
+  
+ngOnInit() {
+  const profile = this.authService.userProfile();
+  if (profile?.role === 'admin') this.company = 'JobBoard';
+  else if (profile?.company) this.company = profile.company;
+  // no more EMPLOYER_SEED_DATA
+}
+
 
   isAdmin(): boolean {
     return this.authService.userProfile()?.role === 'admin';
   }
 
+  toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
+  }
+
+  toggleQuestionSelection(question: { text: string; selected: boolean }) {
+    question.selected = !question.selected;
+  }
+
+  addCustomDropdownQuestion() {
+    const trimmed = this.newDropdownQuestion.trim();
+    if (!trimmed) return;
+
+    if (!this.dropdownQuestions.some(q => q.text.toLowerCase() === trimmed.toLowerCase())) {
+      this.dropdownQuestions.push({ text: trimmed, selected: true, isCustom: true });
+    }
+
+    this.newDropdownQuestion = '';
+  }
+
+  deleteDropdownQuestion(index: number) {
+    if (this.dropdownQuestions[index]?.isCustom) {
+      this.dropdownQuestions.splice(index, 1);
+    }
+  }
+
+ addSelectedQuestionsToForm() {
+  this.dropdownQuestions.forEach(q => {
+    if (q.selected) {
+      // Avoid duplicate questions
+      const exists = this.applicationQuestions.some(aq => aq.question === q.text);
+      if (!exists) {
+        this.applicationQuestions.push({ question: q.text });
+      }
+      q.selected = false; // reset checkbox
+    }
+  });
+  this.showDropdown = false; // close dropdown after adding
+}
+
+  removeQuestion(index: number) {
+    this.applicationQuestions.splice(index, 1);
+  }
+
   openConfirmModal() {
     this.error = '';
-
-    // Validate user-editable fields
-    if (
-      !this.title ||
-      !this.location ||
-      !this.type ||
-      !this.description ||
-      !this.salaryMin ||
-      !this.salaryMax
-    ) {
+    if (!this.title || !this.location || !this.type || !this.description || !this.salaryMin || !this.salaryMax) {
       this.error = 'Please fill in all fields';
       return;
     }
 
-    // Format salary range
     const minNum = parseInt(this.salaryMin);
     const maxNum = parseInt(this.salaryMax);
     if (minNum >= maxNum) {
@@ -91,18 +130,9 @@ export class CreateJob implements OnInit {
     }
 
     this.salary = `₱${minNum.toLocaleString()} - ₱${maxNum.toLocaleString()}`;
-
-    // Ensure company is set from profile
     const profile = this.authService.userProfile();
-    if (profile?.role === 'admin') {
-      this.company = 'jobboard';
-    } else if (profile?.company) {
-      this.company = profile.company;
-      console.log('Company set to:', this.company);
-    } else {
-      console.warn('Company not found in profile:', profile);
-    }
-
+    if (profile?.role === 'admin') this.company = 'jobboard';
+    else if (profile?.company) this.company = profile.company;
     this.showConfirmModal = true;
   }
 
@@ -113,13 +143,17 @@ export class CreateJob implements OnInit {
   async confirmCreateJob() {
     this.isSubmitting = true;
     this.error = '';
-
     const userId = this.authService.currentUser()?.uid;
     if (!userId) {
       this.error = 'User not authenticated';
       this.isSubmitting = false;
       return;
     }
+
+    const filteredQuestions = this.applicationQuestions
+      .map(q => q.question.trim())
+      .filter(q => q.length > 0)
+      .map(q => ({ question: q, answer: '' }));
 
     const newJob = {
       title: this.title,
@@ -129,21 +163,90 @@ export class CreateJob implements OnInit {
       description: this.description,
       salary: this.salary,
       postedBy: userId,
+      applicationQuestions: filteredQuestions,
     };
 
     try {
       const created = await this.jobService.create(newJob);
-      if (created) {
-        console.log('Job created successfully:', created);
-        this.router.navigate(['/employer-jobs']);
-      } else {
-        this.error = 'Failed to create job';
-        this.isSubmitting = false;
-      }
+      if (created) this.router.navigate(['/employer-jobs']);
+      else this.error = 'Failed to create job';
     } catch (err) {
-      console.error('Error creating job:', err);
       this.error = 'Error creating job: ' + (err instanceof Error ? err.message : String(err));
+    } finally {
       this.isSubmitting = false;
     }
   }
+
+ formatBullets() {
+  const mirror = document.querySelector('.textarea-mirror');
+  if (!mirror) return;
+
+  // Add line breaks and bullets
+  mirror.innerHTML = this.description
+    .split('\n')
+    .map(line => {
+      line = line.trim();
+      if (line.startsWith('*') || line.startsWith('-')) {
+        return `• ${line.slice(1).trim()}`;
+      } else {
+        return line;
+      }
+    })
+    .join('<br>');
 }
+
+formatDescription(text: string): string {
+  if (!text) return '';
+
+  const lines = text.split('\n');
+
+  let html = '';
+  let inList = false;
+
+  for (let line of lines) {
+    line = line.trim();
+    if (line.startsWith('-') || line.startsWith('*')) {
+      const content = line.slice(1).trim();
+      if (!inList) {
+        html += '<ul>';
+        inList = true;
+      }
+      html += `<li>${content}</li>`;
+    } else {
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      if (line) html += `<p>${line}</p>`;
+    }
+  }
+
+  if (inList) html += '</ul>';
+  return html;
+}
+
+
+
+formatBulletsLive() {
+  // Split text into lines
+  const lines = this.description.split('\n');
+
+  // Transform lines starting with '-' or '*' into bullets
+  const formattedLines = lines.map(line => {
+    line = line.trim();
+    if (line.startsWith('- ') || line.startsWith('* ')) {
+      return `• ${line.slice(2)}`;
+    }
+    return line;
+  });
+
+  // Rejoin lines
+  this.description = formattedLines.join('\n');
+}
+
+
+
+
+
+}
+``

@@ -1,4 +1,4 @@
-    import { Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
@@ -28,6 +28,9 @@ export class Profile {
   newPassword: string = '';
   confirmPassword: string = '';
 
+  profileImageFile: File | null = null;
+  profileImageUrl: string | null = null;
+
   loadingProfile = false;
   savingProfile = false;
   savingAccount = false;
@@ -55,12 +58,13 @@ export class Profile {
       this.profile = userProfile;
       this.firstName = userProfile.firstName || '';
       this.lastName = userProfile.lastName || '';
-      this.company = (userProfile as any).company || (userProfile as any).companyName || '';
-      this.headline = (userProfile as any).headline || '';
-      this.bio = (userProfile as any).bio || '';
-      this.location = (userProfile as any).location || '';
-      this.website = (userProfile as any).website || '';
-      this.phone = (userProfile as any).phone || '';
+      this.company = userProfile.companyName || '';
+      this.headline = userProfile.headline || '';
+      this.bio = userProfile.bio || '';
+      this.location = userProfile.location || '';
+      this.website = userProfile.website || '';
+      this.phone = userProfile.phone || '';
+      this.profileImageUrl = (userProfile as any).profileImage || null;
 
       this.email = user.email || userProfile.email;
     } catch (e) {
@@ -71,34 +75,55 @@ export class Profile {
     }
   }
 
-  async saveProfile() {
-    if (!this.profile) return;
+  onProfileImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
 
-    this.savingProfile = true;
-    this.error = null;
-    this.successMessage = null;
+    this.profileImageFile = input.files[0];
 
-    try {
-      await this.authService.updateUserProfile(this.profile.uid, {
-        firstName: this.firstName || undefined,
-        lastName: this.lastName || undefined,
-        company: this.company || undefined,
-        headline: this.headline || undefined,
-        bio: this.bio || undefined,
-        location: this.location || undefined,
-        website: this.website || undefined,
-        phone: this.phone || undefined
-      });
-
-      this.successMessage = 'Profile updated successfully.';
-      await this.loadProfile();
-    } catch (e: any) {
-      console.error('Error saving profile:', e);
-      this.error = 'Failed to update profile.';
-    } finally {
-      this.savingProfile = false;
-    }
+    // Preview image
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.profileImageUrl = reader.result as string;
+    };
+    reader.readAsDataURL(this.profileImageFile);
   }
+  async saveProfile() {
+  if (!this.profile?.uid) {
+    this.error = 'Profile not loaded properly.';
+    return;
+  }
+
+  this.savingProfile = true;
+  this.error = null;
+  this.successMessage = null;
+
+  try {
+    // Only include fields that are non-empty
+    const updatedProfile: Partial<UserProfile & { profileImage?: string }> = {};
+    if (this.firstName) updatedProfile.firstName = this.firstName;
+    if (this.lastName) updatedProfile.lastName = this.lastName;
+    if (this.company) updatedProfile.companyName = this.company;
+    if (this.headline) updatedProfile.headline = this.headline;
+    if (this.bio) updatedProfile.bio = this.bio;
+    if (this.location) updatedProfile.location = this.location;
+    if (this.website) updatedProfile.website = this.website;
+    if (this.phone) updatedProfile.phone = this.phone;
+    if (this.profileImageUrl) updatedProfile.profileImage = this.profileImageUrl;
+
+    await this.authService.updateUserProfile(this.profile.uid, updatedProfile);
+
+    this.successMessage = 'Profile updated successfully.';
+    await this.loadProfile();
+  } catch (e: any) {
+    console.error('Error saving profile:', e);
+    this.error = e?.message || 'Failed to update profile.';
+  } finally {
+    this.savingProfile = false;
+  }
+}
+
+  
 
   async saveAccountSettings() {
     if (!this.profile) return;
@@ -133,4 +158,3 @@ export class Profile {
     }
   }
 }
-

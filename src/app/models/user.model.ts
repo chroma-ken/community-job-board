@@ -4,7 +4,7 @@ export interface UserProfile {
   uid: string;
   firstName?: string;
   lastName?: string;
-  companyName? : string;
+  companyName?: string;
   email: string;
   role: UserRole;
   displayName?: string;
@@ -16,4 +16,5 @@ export interface UserProfile {
   phone?: string;
   bio?: string;
   headline?: string;
+  profileImage?: string; // NEW: profile picture URL
 }

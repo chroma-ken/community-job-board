@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User, updateEmail as fbUpdateEmail, updatePassword as fbUpdatePassword, sendPasswordResetEmail } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User, updateEmail as fbUpdateEmail, updatePassword as fbUpdatePassword, sendPasswordResetEmail, sendEmailVerification } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc, collection, updateDoc } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { UserProfile, UserRole } from '../models/user.model';
@@ -74,7 +74,23 @@ export class AuthService {
     
     try {
       const credential = await signInWithEmailAndPassword(this.auth, email, password);
-      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for auth state to update
+      
+      const userDocRef = doc(this.firestore, 'users', credential.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (!userDoc.exists()) {
+        await signOut(this.auth);
+        this.authError.set('This account has been deleted. Please contact support or create a new account.');
+        return false;
+      }
+      
+      if (!credential.user.emailVerified) {
+        this.authError.set('Please verify your email before logging in. Check your inbox for the verification link.');
+        await signOut(this.auth);
+        return false;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
       await this.loadUserProfile(credential.user.uid);
       this.clearError();
       this.router.navigate(['/']);
@@ -96,6 +112,8 @@ export class AuthService {
     try {
       const credential = await createUserWithEmailAndPassword(this.auth, email, password);
       
+      await sendEmailVerification(credential.user);
+      
       const userProfile: UserProfile = {
         uid: credential.user.uid,
         firstName: firstName,
@@ -108,22 +126,30 @@ export class AuthService {
       };
       
       await setDoc(doc(this.firestore, 'users', credential.user.uid), userProfile);
-      this.userProfile.set(userProfile);
-
-      this.clearError();
-
-      if (role === 'applicant') {
-        this.router.navigate(['/profile']);
-      } else {
-        this.router.navigate(['/']);
-      }
-
-      return true;
+      
+      await signOut(this.auth);
+      
+      this.authError.set('Registration successful! Please check your email to verify your account before logging in.');
+      
+      return false;
     } catch (error: any) {
       this.authError.set(this.getErrorMessage(error.code));
       return false;
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async resendVerificationEmail(): Promise<void> {
+    const user = this.auth.currentUser;
+    if (user && !user.emailVerified) {
+      try {
+        await sendEmailVerification(user);
+      } catch (error: any) {
+        console.error('Error sending verification email:', error);
+        this.authError.set(this.getErrorMessage(error.code || error.message));
+        throw error;
+      }
     }
   }
 

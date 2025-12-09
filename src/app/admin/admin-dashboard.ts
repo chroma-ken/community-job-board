@@ -72,11 +72,13 @@ export class AdminDashboard implements OnInit {
   }
 
   loadJobs() {
-    this.loading.set(true);
-    this.allJobs.set(this.jobsService.list());
-    this.currentPage.set(1); // Reset to first page
-    this.loading.set(false);
-  }
+  this.loading.set(true);
+  // Only show jobs that are pending or rejected
+  this.allJobs.set(this.jobsService.list().filter(job => job.status !== 'approved'));
+  this.currentPage.set(1); // Reset to first page
+  this.loading.set(false);
+}
+
 
   resetFilters() {
     this.searchTitle.set('');
@@ -130,12 +132,12 @@ export class AdminDashboard implements OnInit {
   openRejectConfirm(job: Job) {
     this.jobToAction = job;
     this.confirmModalTitle = 'Reject Job';
-    this.confirmModalMessage = `Are you sure you want to reject "${job.title}"?`;
+    this.confirmModalMessage = `Are you sure you want to reject "${job.title}"? This job will not be visible to applicants.`;
     this.confirmModalAction = async () => {
       if (this.jobToAction?.id) {
-        await this.jobsService.delete(this.jobToAction.id);
+        await this.jobsService.update(this.jobToAction.id, { status: 'rejected' });
         this.loadJobs();
-        this.showMessage('success', `Job "${this.jobToAction.title}" has been removed.`);
+        this.showMessage('success', `Job "${this.jobToAction.title}" has been rejected.`);
         this.closeModal();
       }
     };

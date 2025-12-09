@@ -27,4 +27,5 @@ export interface Job {
   minimumRequirements?: string[];
   preferredRequirements?: string[];
   jobExpectations?: string[];
+  applicationQuestions?: ApplicationResponse[]; 
 }

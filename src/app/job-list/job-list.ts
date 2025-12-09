@@ -1,13 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { JobsService } from '../services/jobs-service';
-import { Job } from '../models/job.model';
+import { Job, ApplicationResponse } from '../models/job.model';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-job-list',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './job-list.html',
   styleUrl: './job-list.css',
@@ -15,106 +16,150 @@ import { Router } from '@angular/router';
 export class JobList implements OnInit {
   private jobService = inject(JobsService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   authService = inject(AuthService);
 
   jobs: Job[] = [];
-  jobTitleSearch = "";
-  jobLocationSearch = "";
-  jobTypeSearch = "";
-
   jobDetails: Job | null = null;
-  showApplicationModal = false;
-  isSubmitting = false;
-  showConfirmation = false;
-  applicationResponses: { question: string; answer: string }[] = [];
 
-  showAlertModal = false;
-  alertMessage = '';
-
-  applicationQuestions = [
-    { question: 'Why are you interested in this position?', required: true },
-    { question: 'What relevant experience do you have?', required: true },
-    { question: 'What are your salary expectations?', required: false },
-    { question: 'When are you available to start?', required: true }
-  ];
-
-  jobTypes = [
-    { value: "", label: "All Job Types" },
-    { value: "Full-Time", label: "Full-Time" },
-    { value: "Part-Time", label: "Part-Time" },
-    { value: "Contract", label: "Contract" },
-    { value: "Remote", label: "Remote" }
-  ];
+  jobTitleSearch = '';
+  jobLocationSearch = '';
+  jobTypeSearch = '';
 
   filters = {
-    title: "",
-    company: "",
-    location: "",
-    type: ""
+    title: '',
+    company: '',
+    location: '',
+    type: '',
   };
 
+  showApplicationModal = false;
+  showConfirmation = false;
+  showAlertModal = false;
+
+  alertMessage = '';
+  isSubmitting = false;
+
+  applicationResponses: ApplicationResponse[] = [];
+
+  jobTypes = [
+    { value: '', label: 'All Job Types' },
+    { value: 'Full-Time', label: 'Full-Time' },
+    { value: 'Part-Time', label: 'Part-Time' },
+    { value: 'Hybrid', label: 'Hybrid' },
+    { value: 'Hybrid(1 day onsite / WFH rest of the week)', label: 'Hybrid' },
+    { value: 'Hybrid(2 days onsite / WFH rest of the week)', label: 'Hybrid' },
+    { value: 'Hybrid(3 days onsite / WFH rest of the week)', label: 'Hybrid' },
+    { value: 'Full-Time(Remote)', label: 'Full-Time-Remote' },
+    { value: 'Part-Time(Remote)', label: 'Part-Time-Remote' },
+    { value: 'Contract', label: 'Contract' },
+    { value: 'Remote', label: 'Remote' },
+  ];
+
   async ngOnInit() {
+    // Load jobs first
     await this.jobService.loadJobs();
     this.jobs = this.jobService.list();
+
+    // Check if login/signup redirected user back to apply automatically
+    const returnJobId = this.route.snapshot.queryParamMap.get('applyJobId');
+    if (returnJobId) {
+      const job = this.jobService.getById(returnJobId);
+
+      if (job) {
+        this.viewJob(returnJobId);
+
+        // Auto-open application modal only if logged in
+        if (this.authService.isLoggedIn()) {
+          this.autoOpenApplication(returnJobId);
+        }
+      }
+    }
   }
 
+  // Auto-open application modal after login/signup redirect
+  autoOpenApplication(jobId: string) {
+    const job = this.jobService.getById(jobId);
+    if (!job) return;
+
+    this.applicationResponses = (job.applicationQuestions || []).map(q => ({
+      question: q.question,
+      answer: '',
+    }));
+
+    this.showApplicationModal = true;
+    this.showConfirmation = false;
+  }
+
+  // Searching functionality
   searchJob() {
     this.filters = {
       title: this.jobTitleSearch,
-      company: "",
+      company: '',
       location: this.jobLocationSearch,
-      type: this.jobTypeSearch
+      type: this.jobTypeSearch,
     };
+
     this.jobs = this.jobService.list(this.filters);
   }
 
   resetFilters() {
-    this.jobTitleSearch = "";
-    this.jobLocationSearch = "";
-    this.jobTypeSearch = "";
-    this.filters = {
-      title: "",
-      company: "",
-      location: "",
-      type: ""
-    };
+    this.jobTitleSearch = '';
+    this.jobLocationSearch = '';
+    this.jobTypeSearch = '';
+
+    this.filters = { title: '', company: '', location: '', type: '' };
     this.jobs = this.jobService.list();
   }
 
+  // View job details
   viewJob(id: string | undefined) {
     if (!id) return;
     this.jobDetails = this.jobService.getById(id) || null;
   }
 
-  isJobSaved(jobId: string | undefined): boolean {
-    if (!jobId) return false;
-    return this.jobService.isJobSaved(jobId);
+  // Saved jobs
+  isJobSaved(jobId: string | undefined) {
+    return jobId ? this.jobService.isJobSaved(jobId) : false;
   }
 
   async toggleSaveJob(jobId: string | undefined, event: Event) {
     event.stopPropagation();
-    if (!jobId || !this.authService.isLoggedIn()) {
+
+    if (!jobId) return;
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login'], {
+        queryParams: { redirect: 'savedJobs' },
+      });
       return;
     }
+
     await this.jobService.toggleSaveJob(jobId);
   }
 
-  canSaveJobs(): boolean {
+  canSaveJobs() {
     return this.authService.isLoggedIn() && this.authService.isApplicant();
   }
 
+  // Handle applying to job
   async applyToJob(jobId: string | undefined, event: Event) {
     event.stopPropagation();
     if (!jobId) return;
 
+    // If user is unlogged → send to login/signup and preserve job ID
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], {
+        queryParams: { applyJobId: jobId },
+      });
       return;
     }
 
-    this.applicationResponses = this.applicationQuestions.map(q => ({
+    const job = this.jobService.getById(jobId);
+    if (!job) return;
+
+    this.applicationResponses = (job.applicationQuestions || []).map(q => ({
       question: q.question,
-      answer: ''
+      answer: '',
     }));
 
     this.showApplicationModal = true;
@@ -138,13 +183,8 @@ export class JobList implements OnInit {
   }
 
   async submitApplication() {
-    const requiredQuestions = this.applicationQuestions.filter(q => q.required);
-    const allRequiredAnswered = requiredQuestions.every((q, index) => {
-      const response = this.applicationResponses.find(r => r.question === q.question);
-      return response && response.answer.trim().length > 0;
-    });
-
-    if (!allRequiredAnswered) {
+    const allAnswered = this.applicationResponses.every(r => r.answer.trim());
+    if (!allAnswered) {
       this.showAlert('Please answer all required questions.');
       return;
     }
@@ -163,14 +203,47 @@ export class JobList implements OnInit {
 
     if (success) {
       this.showConfirmation = true;
+
       await this.jobService.loadJobs();
       this.jobs = this.jobService.list(this.filters);
+
       if (this.jobDetails?.id === jobId) {
         this.viewJob(jobId);
       }
     } else {
-      this.showAlert('Failed to apply. You may have already applied to this job.');
+      this.showAlert('Failed to apply. You may have already applied.');
       this.closeApplicationModal();
     }
   }
+
+  formatDescription(text: string): string {
+  if (!text) return '';
+
+  const lines = text.split('\n');
+
+  let html = '';
+  let inList = false;
+
+  for (let line of lines) {
+    line = line.trim();
+    if (line.startsWith('-') || line.startsWith('*')) {
+      const content = line.slice(1).trim();
+      if (!inList) {
+        html += '<ul>';
+        inList = true;
+      }
+      html += `<li>${content}</li>`;
+    } else {
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      if (line) html += `<p>${line}</p>`;
+    }
+  }
+
+  if (inList) html += '</ul>';
+  return html;
+}
+
 }

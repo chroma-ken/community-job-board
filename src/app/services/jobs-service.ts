@@ -417,4 +417,29 @@ export class JobsService {
       return false;
     }
   }
+
+  async getJobsAppliedByUser(userId: string): Promise<Job[]> {
+    try {
+      const allJobs = await this.getAllJobs();
+      return allJobs.filter(job => 
+        job.applicants?.some(applicant => applicant.userId === userId)
+      );
+    } catch (error) {
+      console.error('Error getting jobs applied by user:', error);
+      return [];
+    }
+  }
+
+  async removeUserFromAllApplications(userId: string): Promise<void> {
+    try {
+      const appliedJobs = await this.getJobsAppliedByUser(userId);
+      for (const job of appliedJobs) {
+        if (job.id) {
+          await this.removeApplicant(job.id, userId);
+        }
+      }
+    } catch (error) {
+      console.error('Error removing user from all applications:', error);
+    }
+  }
 }

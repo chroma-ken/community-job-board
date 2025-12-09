@@ -5,28 +5,27 @@
       <div class="row g-2 align-items-center search-bar-wrapper">
         <div class="col-md-4">
           <div class="input-icon-container">
-            <i class="fas fa-search input-icon"></i> 
-            <input type="text" class="form-control" name="job-title" id="job-title" placeholder="Search for Title" [(ngModel)]="jobTitleSearch">
+            <i class="fas fa-search input-icon"></i>
+            <input type="text" class="form-control" placeholder="Search for Title" [(ngModel)]="jobTitleSearch">
           </div>
         </div>
         <div class="col-md-4">
           <div class="input-icon-container">
-            <i class="fas fa-location-dot input-icon"></i> 
-            <input type="text" class="form-control" name="job-location" id="job-location" placeholder="Location (e.g, Manila)" [(ngModel)]="jobLocationSearch">
+            <i class="fas fa-location-dot input-icon"></i>
+            <input type="text" class="form-control" placeholder="Location (e.g, Manila)" [(ngModel)]="jobLocationSearch">
           </div>
         </div>
         <div class="col-md-2">
           <div class="input-icon-container">
-            <i class="fas fa-filter input-icon"></i> 
-            <i class="fas fa-chevron-down dropdown-arrow"></i> 
-            <select class="form-control" name="job-type" id="job-type" [(ngModel)]="jobTypeSearch">
+            <i class="fas fa-filter input-icon"></i>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+            <select class="form-control" [(ngModel)]="jobTypeSearch">
               @for (type of jobTypes; track type.value) {
                 <option [value]="type.value">{{ type.label }}</option>
               }
             </select>
           </div>
         </div>
-        
         <div class="col-md-2 d-flex gap-2 justify-content-end">
           <button class="btn btn-primary" (click)="searchJob()">Search</button>
           <button class="btn btn-danger" (click)="resetFilters()">Reset</button>
@@ -35,6 +34,7 @@
     </div>
   </div>
 </div>
+
 <div class="container-fluid">
   <div class="row mx-5 my-4">
     <div class="col-4">
@@ -62,6 +62,7 @@
         }
       </div>
     </div>
+
     <div class="col">
       @if (jobDetails) {
         <div class="job-details-card">
@@ -72,7 +73,8 @@
             <span class="badge badge-meta me-2">{{ jobDetails.type }}</span>
             <span class="badge bg-success">{{ jobDetails.salary }}</span>
           </div>
-          <p class="mt-4">{{ jobDetails.description }}</p>
+         <div class="mt-4 description-text" [innerHTML]="formatDescription(jobDetails.description)"></div>
+
           <div class="d-flex gap-2 mt-4">
             <button class="btn btn-primary" (click)="applyToJob(jobDetails.id, $event)">Apply</button>
             @if (canSaveJobs()) {
@@ -104,15 +106,15 @@
         <h2>Apply for {{ jobDetails.title }}</h2>
         <p class="text-muted mb-4">Please answer the following questions to complete your application.</p>
 
+        <div class="alert alert-warning mb-4">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Important:</strong> Please do not include sensitive personal information such as banking details, government ID numbers, social security numbers, or passwords in your responses.
+        </div>
+
         <form>
           @for (response of applicationResponses; track $index) {
             <div class="form-group mb-3">
-              <label class="form-label fw-bold">
-                {{ response.question }}
-                @if (applicationQuestions[$index].required) {
-                  <span class="text-danger">*</span>
-                }
-              </label>
+              <label class="form-label fw-bold">{{ response.question }}</label>
               <textarea
                 class="form-control"
                 rows="4"
@@ -149,9 +151,7 @@
             Your application for <strong>{{ jobDetails.title }}</strong> has been successfully submitted.
             The employer will review your application and get back to you soon.
           </p>
-          <button class="btn btn-primary" (click)="closeApplicationModal()">
-            Done
-          </button>
+          <button class="btn btn-primary" (click)="closeApplicationModal()">Done</button>
         </div>
       }
     </div>
