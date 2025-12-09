@@ -408,4 +408,18 @@ p {
     box-shadow: none;
     background: transparent;
   }
+
+  .description-text ul {
+  padding-left: 1.2em;
+  margin: 0.5em 0;
+}
+
+.description-text li {
+  margin-bottom: 0.3em;
+}
+
+.description-text p {
+  margin-bottom: 0.5em;
+}
+
 }
