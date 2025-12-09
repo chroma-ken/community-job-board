@@ -103,18 +103,26 @@
                   <span class="badge badge-meta">{{ job.type }}</span>
                 </td>
                 <td>
-                  <button 
-                    class="btn btn-sm btn-outline-primary me-1" 
-                    (click)="selectJob(job)"
-                  >
-                    View
-                  </button>
-                  <button 
-                    class="btn btn-sm btn-success me-1" 
-                    (click)="approveJob(job)"
-                  >
-                    Approve
-                  </button>
+                  <div class="action-buttons-cell">
+                    <button 
+                      class="btn btn-sm btn-outline-primary" 
+                      (click)="selectJob(job)"
+                    >
+                      View
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-success" 
+                      (click)="approveJob(job)"
+                    >
+                      Approve
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-warning" 
+                      (click)="openRejectConfirm(job)"
+                    >
+                      Reject
+                    </button>
+                  </div>
                 </td>
               </tr>
             }

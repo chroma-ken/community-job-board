@@ -30,8 +30,7 @@
   font-weight: 600;
 }
 
-/* --- SEARCH BAR/ICON STYLING (Fixed) --- */
-
+/* --- SEARCH BAR --- */
 .search-bar-wrapper {
   background-color: transparent; 
   box-shadow: none; 
@@ -45,7 +44,6 @@
 
 .input-icon {
   position: absolute;
-  /* FIX: Apply generous left offset */
   left: 30px; 
   top: 50%;
   transform: translateY(-50%);
@@ -55,7 +53,6 @@
   margin-top: 2px; 
 }
 
-/* Input/Form Control Styling to mimic Job List */
 .form-control {
   padding: 10px 15px 10px 15px; 
   border: none;
@@ -68,7 +65,6 @@
 }
 
 .input-icon-container .form-control {
-   /* FIX: Apply large left padding for icon clearance */
    padding-left: 65px; 
 }
 
@@ -79,9 +75,7 @@
   box-shadow: none; 
 }
 
-/* --- END SEARCH BAR/ICON STYLING --- */
-
-
+/* --- BUTTONS --- */
 .btn-success {
     --bs-btn-bg: #1f57bf;
     --bs-btn-border-color: #1f57bf;
@@ -122,6 +116,32 @@
     --bs-btn-border-color: #3b82f6;
 }
 
+/* --- FIX: Table Actions Layout --- */
+.table .btn {
+  padding: 6px 12px; /* Smaller padding inside table */
+  font-size: 0.85rem; /* Compact font */
+  min-width: auto; /* Allow buttons to shrink to fit content */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px; /* Fixed height for uniformity */
+}
+
+/* Ensure the Actions column is wide enough */
+.table td:last-child {
+  width: 1%; /* Trick to shrink wrap content, but... */
+  white-space: nowrap; /* Prevent wrapping to next line */
+  vertical-align: middle;
+}
+
+/* Flex container inside the TD (added in HTML below) */
+.action-buttons-cell {
+  display: flex;
+  gap: 8px; /* Consistent space between buttons */
+  justify-content: flex-start;
+}
+
+/* Modal Styles */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -204,32 +224,16 @@
   margin-left: -1px;
 }
 
-h2{
+h2 {
   font-family: Poppins;
   font-weight: 700;
 }
 
-/* --- RESPONSIVE MODAL --- */
 @media (max-width: 576px) {
   .modal-content {
     width: 95%;
     margin: 10px;
     padding: 20px;
     max-height: 85vh;
-  }
-
-  .modal-title {
-    font-size: 1.4rem;
-  }
-
-  /* Stack footer buttons */
-  .modal-footer {
-    flex-direction: column-reverse; /* Put primary button on top if desired, or standard column */
-    gap: 10px;
-  }
-
-  .modal-footer .btn {
-    width: 100%;
-    margin: 0;
   }
 }
