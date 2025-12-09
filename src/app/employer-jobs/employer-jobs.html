@@ -49,7 +49,8 @@
             <span class="badge badge-meta me-2">{{ selectedJob.type }}</span>
             <span class="badge bg-success">{{ selectedJob.salary }}</span>
           </div>
-          <p class="mt-4">{{ selectedJob.description }}</p>
+           <div class="mt-4 description-text" [innerHTML]="formatDescription(selectedJob.description)"></div>
+
           @if (selectedJob.postedDate) {
             <p class="text-muted small mt-4">
               Posted: {{ selectedJob.postedDate | date: 'short' }}

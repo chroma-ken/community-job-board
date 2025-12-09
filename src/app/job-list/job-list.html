@@ -83,7 +83,7 @@
               <span class="badge badge-meta me-2">{{ jobDetails.type }}</span>
               <span class="badge bg-success">{{ jobDetails.salary }}</span>
             </div>
-            <p class="mt-4">{{ jobDetails.description }}</p>
+            <div class="mt-4 description-text" [innerHTML]="formatDescription(jobDetails.description)"></div>
             <div class="d-flex gap-2 mt-4">
               <button class="btn btn-primary" (click)="applyToJob(jobDetails.id, $event)">Apply</button>
               @if (canSaveJobs()) {

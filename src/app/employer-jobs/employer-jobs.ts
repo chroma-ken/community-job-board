@@ -282,4 +282,35 @@ export class EmployerJobs implements OnInit {
         return 'bg-secondary';
     }
   }
+
+  
+formatDescription(text: string): string {
+  if (!text) return '';
+
+  const lines = text.split('\n');
+
+  let html = '';
+  let inList = false;
+
+  for (let line of lines) {
+    line = line.trim();
+    if (line.startsWith('-') || line.startsWith('*')) {
+      const content = line.slice(1).trim();
+      if (!inList) {
+        html += '<ul>';
+        inList = true;
+      }
+      html += `<li>${content}</li>`;
+    } else {
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      if (line) html += `<p>${line}</p>`;
+    }
+  }
+
+  if (inList) html += '</ul>';
+  return html;
+}
 }
